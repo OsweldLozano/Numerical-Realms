@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Bocina silenciada: cuerpo + cruz -->
+  <path fill="#ffffff" d="M4 24 h12 l16 -14 v44 l-16 -14 h-12 z"/>
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round">
+    <line x1="42" y1="24" x2="58" y2="40"/>
+    <line x1="58" y1="24" x2="42" y2="40"/>
+  </g>
+</svg>
