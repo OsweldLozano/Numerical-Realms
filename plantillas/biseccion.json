@@ -1,0 +1,33 @@
+{
+  "titulo": "Bisección",
+  "nivel": "Bisectriz",
+  "generador": "biseccion",
+  "parametros": {"iteraciones": 4},
+  "tiempo": 720,
+  "decimales": 4,
+  "instruccion": "Aproxime la raíz de {funcion} en el intervalo [{a}, {b}] con {len(iteraciones)} iteraciones del método de bisección.",
+  "intro": [
+    "{funcion}",
+    "c = (a + b) / 2.  Si f(a)·f(c) < 0 la raíz está en [a, c]; si no, en [c, b].",
+    "Escriba f(c) con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones", "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: intervalo [{it.a}, {it.b}]",
+        "filas": [
+          ["c = ({it.a} + {it.b}) / 2 =", {"in": "it.c"}],
+          ["f(c) =", {"in": "it.fc", "decimales": 4}],
+          ["Nuevo intervalo: [", {"in": "it.a_nuevo"}, ",", {"in": "it.b_nuevo"}, "]"]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Resultado:",
+      "filas": [
+        ["Aproximación de la raíz: x ≈", {"in": "raiz"}]
+      ]
+    }
+  ]
+}

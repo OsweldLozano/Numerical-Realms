@@ -1,0 +1,39 @@
+{
+  "titulo": "Interpolación Lineal",
+  "generador": "interpolacion_lineal",
+  "tiempo": 600,
+  "decimales": 4,
+  "instruccion": "Calcule g({x}) usando interpolación lineal con los puntos ({x0}, {y0}) y ({x1}, {y1}).",
+  "intro": [
+    "g(x) = y0 + (y1 - y0) / (x1 - x0) · (x - x0)",
+    "Datos:  x0={x0}  y0={y0}  x1={x1}  y1={y1}  x={x}"
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Sustituya los valores en la fórmula:",
+      "filas": [
+        ["g(x) =", {"in": "y0"}, "+"],
+        ["(", {"in": "y1"}, "-", {"in": "y0"}, ")", "/", "(", {"in": "x1"}, "-", {"in": "x0"}, ")", "·", "(", {"in": "x"}, "-", {"in": "x0"}, ")"]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Resuelva las restas:",
+      "filas": [
+        ["g(x) =", {"in": "y0"}, "+", {"in": "dy"}, "/", {"in": "dx"}, "·", {"in": "dx_punto"}]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Calcule la pendiente y el producto (puede escribir fracciones como 7/3):",
+      "filas": [
+        ["m = {dy} / {dx} =", {"in": "m", "decimales": 4}],
+        ["m · (x - x0) = m · {dx_punto} =", {"in": "producto", "decimales": 4, "tol": 0.001}]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Resultado final:",
+      "filas": [
+        ["g({x}) = {y0} + m · {dx_punto} =", {"in": "resultado", "decimales": 4, "tol": 0.001}]
+      ]
+    }
+  ]
+}

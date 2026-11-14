@@ -30,6 +30,8 @@ Estructura del JSON (resumen; el detalle está en la respuesta del chat):
 Token de una fila:
     "texto" o número        -> etiqueta fija
     {"in": 2.5}             -> casilla con respuesta 2.5  (opcional: "tol", "ancho", "limite")
+                               "ancho" usa las mismas unidades de siempre (48 = casilla normal);
+                               el juego lo escala solo a la resolución actual.
     {"matriz": [[...],...]} -> matriz; cada celda es texto/número fijo o {"in": ...}
 También se acepta un solo nivel (objeto) o una lista de niveles sin la clave "niveles".
 """
@@ -43,8 +45,10 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton, UILabel, UITextEntryLine, UIScrollingContainer
 
+import ventana
+from ventana import ANCHO, ALTO
+
 # ----------------------------------------------------------------- constantes
-ANCHO, ALTO = 860, 626
 TIEMPO_DEFECTO = 10 * 60
 
 GRIS = (200, 200, 200)
@@ -56,15 +60,29 @@ BLANCO = (255, 255, 255)
 ROJO = (255, 120, 110)
 AMARILLO = (255, 226, 120)
 
-PERGAMINO = pygame.Rect(283, 125, 540, 473)
-AREA_W = PERGAMINO.width - 20
-ENT_W = 48                       # ancho por defecto de una casilla
-ALTO_FILA = 38
-BOTON_X = AREA_W - 100
-MAX_X = BOTON_X - 8              # las filas no pasan de aquí (se parten en varias líneas)
-CORCHETE_W = 14
+# Diseño de la pantalla, en píxeles de la resolución lógica (1600x900; ver ventana.py)
+MARCO = pygame.Rect(16, 16, 1568, 868)            # recuadro oscuro exterior
+BARRA = pygame.Rect(36, 36, 1528, 96)             # barra superior (íconos y título)
+PILDORA = pygame.Rect(0, 0, 520, 62)              # píldora con el título del nivel
+PILDORA.center = BARRA.center
+COLUMNA = pygame.Rect(36, 152, 400, 712)          # columna izquierda
+CAJA_TIEMPO = pygame.Rect(52, 168, 368, 120)
+CAJA_INSTR = pygame.Rect(52, 304, 368, 424)
+CAJA_ERRORES = pygame.Rect(52, 744, 368, 104)
+PANEL = pygame.Rect(452, 152, 1112, 712)          # panel derecho
+PERGAMINO = PANEL.inflate(-32, -32)
 
-FUENTE_TEMA = {"name": "noto_sans", "size": "16"}
+TAM_FUENTE = 22                  # letra de etiquetas, casillas y botones del pergamino
+AREA_W = PERGAMINO.width - 24    # ancho útil dentro del pergamino (descontando la barra de scroll)
+ENT_W = 64                       # ancho por defecto de una casilla
+ESCALA_JSON = ENT_W / 48         # "ancho" del JSON sigue en las unidades antiguas (48 = normal)
+ALTO_FILA = 48
+BOTON_W, BOTON_H = 140, 44       # botón "Comprobar"
+BOTON_X = AREA_W - BOTON_W - 8
+MAX_X = BOTON_X - 10             # las filas no pasan de aquí (se parten en varias líneas)
+CORCHETE_W = 18
+
+FUENTE_TEMA = {"name": "noto_sans", "size": str(TAM_FUENTE)}
 THEME = {
     "label": {
         "colours": {"normal_text": "#2b1d0e"},
@@ -204,6 +222,13 @@ def cargar_niveles(ruta):
 
 
 # ---------------------------------------------------------------- utilidades
+def ancho_casilla(d):
+    """Ancho en pantalla de una casilla {"in": ...}."""
+    if "ancho" in d:
+        return int(round(d["ancho"] * ESCALA_JSON))
+    return ENT_W
+
+
 def a_numero(texto):
     t = texto.strip().replace(",", ".")
     try:
@@ -276,17 +301,21 @@ class Juego:
         "completado" | "volver" | "salir"  (ver numerical_realms.py).
     """
 
-    def __init__(self, niveles, modo_mapa=False, sonido=True):
-        pygame.init()
+    def __init__(self, niveles, modo_mapa=False, sonido=True, pantalla=None, regenerar=None):
+        """regenerar: función opcional sin argumentos que devuelve un nivel nuevo (un problema
+        distinto). Si se da, "Reintentar" usa un problema nuevo en lugar de repetir el mismo."""
         self.modo_mapa = modo_mapa
+        self.regenerar = regenerar
         self.niveles = niveles
-        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
+        self.pantalla = pantalla or ventana.obtener_pantalla()
         self.reloj = pygame.time.Clock()
         self.manager = pygame_gui.UIManager((ANCHO, ALTO), theme_path=io.StringIO(json.dumps(THEME)))
         self.fuentes = {}
         self.pergamino = crear_pergamino(PERGAMINO.width, PERGAMINO.height)
-        self.rect_config = pygame.Rect(22, 30, 60, 65)
-        self.rect_sonido = pygame.Rect(780, 30, 60, 65)
+        self.rect_config = pygame.Rect(0, 0, 64, 64)
+        self.rect_config.midleft = (BARRA.x + 20, BARRA.centery)
+        self.rect_sonido = pygame.Rect(0, 0, 64, 64)
+        self.rect_sonido.midright = (BARRA.right - 20, BARRA.centery)
         self.sonido = sonido
         self.scroll = UIScrollingContainer(PERGAMINO.copy(), self.manager, allow_scroll_x=False)
         self.corriendo = True
@@ -316,23 +345,23 @@ class Juego:
         self.btn_reintentar = None
         self.pendiente_scroll = 0.0
 
-        y = 6
-        y = self.texto_largo(y, self.titulo, 32)
+        y = 8
+        y = self.texto_largo(y, self.titulo, 42)
         for linea in datos.get("intro", []):
-            y = self.texto_largo(y, linea, 28)
-        self.cursor_y = y + 16
+            y = self.texto_largo(y, linea, 36)
+        self.cursor_y = y + 20
         self.agregar_siguiente_paso()
 
     # ------------------------------------------------- ayudas de interfaz
     def ancho_texto(self, texto):
         try:
-            f = self.manager.get_theme().get_font_dictionary().find_font(16, "noto_sans")
+            f = self.manager.get_theme().get_font_dictionary().find_font(TAM_FUENTE, "noto_sans")
             try:
                 return f.get_rect(texto).width
             except Exception:
                 return f.size(texto)[0]
         except Exception:
-            return len(texto) * 9
+            return len(texto) * 12
 
     def etiqueta(self, rect, texto, centrado=False):
         kw = {"object_id": "#centrado"} if centrado else {}
@@ -365,19 +394,19 @@ class Juego:
                 for fila in m:
                     c = fila[j]
                     if isinstance(c, dict):
-                        w = max(w, c.get("ancho", ENT_W))
+                        w = max(w, ancho_casilla(c))
                     else:
                         w = max(w, self.ancho_texto(str(c)) + 12)
                 anchos.append(w)
             total = sum(anchos) + 4 * (len(anchos) - 1) + 2 * CORCHETE_W
             return ("mat", m, total, len(m) * ALTO_FILA, anchos)
         if isinstance(tok, dict):
-            return ("in", tok, tok.get("ancho", ENT_W), ALTO_FILA, None)
+            return ("in", tok, ancho_casilla(tok), ALTO_FILA, None)
         txt = str(tok)
         return ("txt", txt, self.ancho_texto(txt) + 12, ALTO_FILA, None)
 
     def crear_entrada(self, paso, x, y, d):
-        e = UITextEntryLine(pygame.Rect(x, y, d.get("ancho", ENT_W), ALTO_FILA - 4),
+        e = UITextEntryLine(pygame.Rect(x, y, ancho_casilla(d), ALTO_FILA - 4),
                             self.manager, container=self.scroll)
         if _es_numero(d["in"]):
             e.set_allowed_characters(list("0123456789.,-/"))
@@ -390,7 +419,7 @@ class Juego:
         paso = self.pasos_pendientes.pop(0)
         self.pasos.append(paso)
         y = self.cursor_y
-        y_tit = self.texto_largo(y, paso.titulo, 30)
+        y_tit = self.texto_largo(y, paso.titulo, 38)
         ry = y_tit
 
         for fila in paso.filas:
@@ -418,9 +447,9 @@ class Juego:
                     x += w + 4
                 ry += lh
 
-        paso.boton = UIButton(pygame.Rect(BOTON_X, y_tit, 96, 34), "Comprobar",
+        paso.boton = UIButton(pygame.Rect(BOTON_X, y_tit, BOTON_W, BOTON_H), "Comprobar",
                               self.manager, container=self.scroll)
-        self.cursor_y = ry + 18
+        self.cursor_y = ry + 22
         self.scroll.set_scrollable_area_dimensions((AREA_W, self.cursor_y + 10))
         self.pendiente_scroll = 1.0 if len(self.pasos) > 1 else 0.0
 
@@ -433,7 +462,7 @@ class Juego:
             cx = x + CORCHETE_W
             for j, c in enumerate(fila):
                 if isinstance(c, dict):
-                    ex = cx + (anchos[j] - c.get("ancho", ENT_W)) // 2
+                    ex = cx + (anchos[j] - ancho_casilla(c)) // 2
                     self.crear_entrada(paso, ex, fy, c)
                 else:
                     self.etiqueta(pygame.Rect(cx, fy, anchos[j], ALTO_FILA - 4), str(c), centrado=True)
@@ -442,26 +471,26 @@ class Juego:
     def agregar_final(self):
         y = self.cursor_y
         if self.modo_mapa:
-            self.btn_volver = UIButton(pygame.Rect(0, y, 180, 36), "Volver al mapa",
+            self.btn_volver = UIButton(pygame.Rect(0, y, 240, 46), "Volver al mapa",
                                        self.manager, container=self.scroll)
         elif self.idx + 1 < len(self.niveles):
-            self.btn_sig = UIButton(pygame.Rect(0, y, 180, 36), "Siguiente nivel >>",
+            self.btn_sig = UIButton(pygame.Rect(0, y, 240, 46), "Siguiente nivel >>",
                                     self.manager, container=self.scroll)
         else:
-            self.etiqueta(pygame.Rect(0, y, AREA_W, 30), "¡Terminaste todos los niveles!")
-        self.cursor_y = y + 50
+            self.etiqueta(pygame.Rect(0, y, AREA_W, 38), "¡Terminaste todos los niveles!")
+        self.cursor_y = y + 62
         self.scroll.set_scrollable_area_dimensions((AREA_W, self.cursor_y))
         self.pendiente_scroll = 1.0
 
     def agregar_botones_tiempo(self):
         """Al agotarse el tiempo (modo mapa): ofrece reintentar o volver."""
         y = self.cursor_y
-        self.etiqueta(pygame.Rect(0, y, AREA_W, 28), "Se acabó el tiempo. ¿Lo intentas de nuevo?")
-        self.btn_reintentar = UIButton(pygame.Rect(0, y + 34, 150, 36), "Reintentar",
+        self.etiqueta(pygame.Rect(0, y, AREA_W, 36), "Se acabó el tiempo. ¿Lo intentas de nuevo?")
+        self.btn_reintentar = UIButton(pygame.Rect(0, y + 44, 190, 46), "Reintentar",
                                        self.manager, container=self.scroll)
-        self.btn_volver = UIButton(pygame.Rect(160, y + 34, 180, 36), "Volver al mapa",
+        self.btn_volver = UIButton(pygame.Rect(204, y + 44, 240, 46), "Volver al mapa",
                                    self.manager, container=self.scroll)
-        self.cursor_y = y + 84
+        self.cursor_y = y + 106
         self.scroll.set_scrollable_area_dimensions((AREA_W, self.cursor_y))
         self.pendiente_scroll = 1.0
 
@@ -510,45 +539,51 @@ class Juego:
     def dibujar_fondo(self):
         s = self.pantalla
         s.fill((245, 245, 245))
-        pygame.draw.rect(s, OSCURO, (8, 13, 844, 598))
-        pygame.draw.rect(s, GRIS, (20, 30, 822, 65))
-        pygame.draw.rect(s, NARANJA, (308, 40, 243, 43), border_radius=22)
-        titulo = self.titulo
-        for tam in (26, 22, 18, 15):
-            if self.fuente(tam).size(titulo)[0] <= 225:
+        pygame.draw.rect(s, OSCURO, MARCO)
+        pygame.draw.rect(s, GRIS, BARRA)
+
+        # título en la píldora: se reduce la letra (y en último caso se recorta) hasta que quepa
+        pygame.draw.rect(s, NARANJA, PILDORA, border_radius=PILDORA.height // 2)
+        titulo, max_w = self.titulo, PILDORA.width - 34
+        for tam in (36, 32, 28, 24, 20):
+            if self.fuente(tam).size(titulo)[0] <= max_w:
                 break
-        while self.fuente(tam).size(titulo)[0] > 225 and len(titulo) > 4:
+        while self.fuente(tam).size(titulo)[0] > max_w and len(titulo) > 4:
             titulo = titulo[:-2].rstrip() + "…" if not titulo.endswith("…") else titulo[:-2] + "…"
         img = self.fuente(tam).render(titulo, True, (40, 20, 5))
-        s.blit(img, img.get_rect(center=(429, 62)))
+        s.blit(img, img.get_rect(center=PILDORA.center))
         self.dibujar_icono_config()
         self.dibujar_icono_sonido()
 
-        pygame.draw.rect(s, GRIS, (20, 110, 232, 488))
+        # columna izquierda: tiempo, instrucción y errores
+        pygame.draw.rect(s, GRIS, COLUMNA)
         t = max(0, int(math.ceil(self.tiempo)))
-        pygame.draw.rect(s, VERDE, (30, 125, 210, 87))
+        pygame.draw.rect(s, VERDE, CAJA_TIEMPO)
         color_t = ROJO if (t <= 60 and self.estado != "ok") else BLANCO
-        self.centrado(24, f"Tiempo: {t // 60:02d}:{t % 60:02d}", color_t, (135, 168))
+        self.centrado(34, f"Tiempo: {t // 60:02d}:{t % 60:02d}", color_t, CAJA_TIEMPO.center)
 
-        pygame.draw.rect(s, CAFE, (30, 223, 210, 262))
-        self.centrado(24, "Instrucción:", BLANCO, (135, 258))
-        for tam in (20, 18, 16, 14, 12):
-            f = self.fuente(tam)
-            lineas = ajustar_texto(f, self.instruccion, 190)
-            if len(lineas) * (tam + 6) <= 150:
+        pygame.draw.rect(s, CAFE, CAJA_INSTR)
+        cx = CAJA_INSTR.centerx
+        self.centrado(34, "Instrucción:", BLANCO, (cx, CAJA_INSTR.y + 40))
+        ancho_max, alto_max = CAJA_INSTR.width - 36, CAJA_INSTR.height - 150
+        for tam in (28, 26, 24, 22, 20, 18, 16):
+            lineas = ajustar_texto(self.fuente(tam), self.instruccion, ancho_max)
+            if len(lineas) * (tam + 8) <= alto_max:
                 break
-        y = 295
+        y = CAJA_INSTR.y + 86 + tam // 2
         for l in lineas:
-            self.centrado(tam, l, BLANCO, (135, y))
-            y += tam + 6
+            self.centrado(tam, l, BLANCO, (cx, y))
+            y += tam + 8
         if self.estado == "ok":
-            self.centrado(22, "¡Nivel completado!", AMARILLO, (135, 462))
+            self.centrado(30, "¡Nivel completado!", AMARILLO, (cx, CAJA_INSTR.bottom - 36))
         elif self.estado == "tiempo":
-            self.centrado(22, "¡Tiempo agotado!", ROJO, (135, 462))
+            self.centrado(30, "¡Tiempo agotado!", ROJO, (cx, CAJA_INSTR.bottom - 36))
 
-        pygame.draw.rect(s, VERDE, (30, 497, 210, 87))
-        self.centrado(24, f"Errores: {self.errores}", BLANCO, (135, 540))
-        pygame.draw.rect(s, GRIS, (264, 110, 578, 488))
+        pygame.draw.rect(s, VERDE, CAJA_ERRORES)
+        self.centrado(34, f"Errores: {self.errores}", BLANCO, CAJA_ERRORES.center)
+
+        # panel derecho con el pergamino
+        pygame.draw.rect(s, GRIS, PANEL)
         s.blit(self.pergamino, PERGAMINO.topleft)
 
     def centrado(self, tam, texto, color, centro):
@@ -560,22 +595,23 @@ class Juego:
         for i in range(8):
             a = i * math.pi / 4
             pygame.draw.line(self.pantalla, OSCURO,
-                             (cx + 14 * math.cos(a), cy + 14 * math.sin(a)),
-                             (cx + 22 * math.cos(a), cy + 22 * math.sin(a)), 7)
-        pygame.draw.circle(self.pantalla, OSCURO, (cx, cy), 17)
-        pygame.draw.circle(self.pantalla, GRIS, (cx, cy), 7)
+                             (cx + 18 * math.cos(a), cy + 18 * math.sin(a)),
+                             (cx + 28 * math.cos(a), cy + 28 * math.sin(a)), 9)
+        pygame.draw.circle(self.pantalla, OSCURO, (cx, cy), 21)
+        pygame.draw.circle(self.pantalla, GRIS, (cx, cy), 9)
 
     def dibujar_icono_sonido(self):
         s = self.pantalla
         cx, cy = self.rect_sonido.center
-        pygame.draw.polygon(s, OSCURO, [(cx - 20, cy - 8), (cx - 10, cy - 8), (cx + 2, cy - 20),
-                                        (cx + 2, cy + 20), (cx - 10, cy + 8), (cx - 20, cy + 8)])
+        cx -= 6                                   # la bocina se ve más centrada así
+        pygame.draw.polygon(s, OSCURO, [(cx - 25, cy - 10), (cx - 12, cy - 10), (cx + 3, cy - 25),
+                                        (cx + 3, cy + 25), (cx - 12, cy + 10), (cx - 25, cy + 10)])
         if self.sonido:
-            for r in (12, 20):
-                pygame.draw.arc(s, OSCURO, (cx + 2 - r, cy - r, 2 * r, 2 * r), -0.9, 0.9, 4)
+            for r in (15, 25):
+                pygame.draw.arc(s, OSCURO, (cx + 3 - r, cy - r, 2 * r, 2 * r), -0.9, 0.9, 5)
         else:
-            pygame.draw.line(s, (170, 40, 40), (cx + 8, cy - 12), (cx + 24, cy + 12), 4)
-            pygame.draw.line(s, (170, 40, 40), (cx + 24, cy - 12), (cx + 8, cy + 12), 4)
+            pygame.draw.line(s, (170, 40, 40), (cx + 10, cy - 15), (cx + 30, cy + 15), 5)
+            pygame.draw.line(s, (170, 40, 40), (cx + 30, cy - 15), (cx + 10, cy + 15), 5)
 
     # ----------------------------------------------------------- bucle
     def procesar(self, ev):
@@ -583,6 +619,8 @@ class Juego:
         if ev.type == pygame.QUIT:
             self.corriendo = False
             return "salir"
+        if ventana.tecla_global(ev):
+            return None
         if ev.type == pygame.KEYDOWN and ev.key == pygame.K_ESCAPE:
             return self.resultado_salida()
         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
@@ -595,6 +633,11 @@ class Juego:
             if self.btn_volver is not None and ev.ui_element is self.btn_volver:
                 return self.resultado_salida()
             if self.btn_reintentar is not None and ev.ui_element is self.btn_reintentar:
+                if self.regenerar is not None:
+                    try:
+                        self.niveles[self.idx] = self.regenerar()
+                    except Exception as e:      # si falla, se repite el mismo problema
+                        print(f"No pude generar un problema nuevo: {e}")
                 self.cargar_nivel(self.idx)
                 return None
             if self.btn_sig is not None and ev.ui_element is self.btn_sig:
@@ -637,6 +680,8 @@ class Juego:
         self.aplicar_sonido()
         while True:
             dt = self.reloj.tick(60) / 1000.0
+            if ventana.sin_foco():               # el jugador se fue a otra ventana
+                return "salir"
             for ev in pygame.event.get():
                 r = self.procesar(ev)
                 if r:

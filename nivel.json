@@ -1,0 +1,37 @@
+{
+  "titulo": "Interpolación Lineal",
+  "instruccion": "Calcule g(2) usando interpolación lineal con los puntos (1, 2) y (3, 6).",
+  "tiempo": 600,
+  "intro": [
+    "g(x) = y0 + (y1 - y0) / (x1 - x0) · (x - x0)",
+    "Datos:  x0=1  y0=2  x1=3  y1=6  x=2"
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso 1. Sustituya los valores en la fórmula:",
+      "filas": [
+        ["g(x) =", {"in": 2}, "+"],
+        ["(", {"in": 6}, "-", {"in": 2}, ")", "/", "(", {"in": 3}, "-", {"in": 1}, ")", "·", "(", {"in": 2}, "-", {"in": 1}, ")"]
+      ]
+    },
+    {
+      "titulo": "Paso 2. Resuelva las restas:",
+      "filas": [
+        ["g(x) =", {"in": 2}, "+", {"in": 4}, "/", {"in": 2}, "·", {"in": 1}]
+      ]
+    },
+    {
+      "titulo": "Paso 3. Calcule la pendiente y el producto:",
+      "filas": [
+        ["m = 4 / 2 =", {"in": 2}],
+        ["m · (x - x0) = 2 · 1 =", {"in": 2}]
+      ]
+    },
+    {
+      "titulo": "Paso 4. Resultado final:",
+      "filas": [
+        ["g(2) = 2 + 2 =", {"in": 4}]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "mapa": {
+    "fondo": "assets\\fondos\\mapa.jpg",
+    "musica": "assets\\musica\\mapa.wav",
+    "subMapas": [
+      {
+        "nombre": "Interpolacion",
+        "posicion": [
+          0.2075,
+          0.2933
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa1.jpg",
+        "musica": "assets\\musica\\subMapa1.wav",
+        "niveles": [
+          {
+            "nombre": "Interpolacion Lineal",
+            "posicion": [
+              0.3069,
+              0.3578
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton Hacia Adelante",
+            "posicion": [
+              0.5312,
+              0.3861
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton Hacia Atras",
+            "posicion": [
+              0.8525,
+              0.5411
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton Diferencias Divididas",
+            "posicion": [
+              0.6375,
+              0.7144
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Lagrange",
+            "posicion": [
+              0.1913,
+              0.8289
+            ],
+            "estado": "disponible"
+          }
+        ]
+      },
+      {
+        "nombre": "Ecuaciones No Lineales",
+        "posicion": [
+          0.5138,
+          0.38
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa2.jpg",
+        "musica": "assets\\musica\\SubMapa2.wav",
+        "niveles": [
+          {
+            "nombre": "Grafica",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Bisectriz",
+            "posicion": [
+              0.4,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton Raphson",
+            "posicion": [
+              0.6,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Punto fijo",
+            "posicion": [
+              0.8,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Falsa Posición",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Secante",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          }
+        ]
+      },
+      {
+        "nombre": "Ecuaciones Lineales",
+        "posicion": [
+          0.8581,
+          0.2911
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa3.jpg",
+        "musica": "assets\\musica\\subMapa3.wav",
+        "niveles": [
+          {
+            "nombre": "Montante",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Gauss-Jordan",
+            "posicion": [
+              0.4,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Eliminacion Gaussiana",
+            "posicion": [
+              0.6,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Gauss-Seidel",
+            "posicion": [
+              0.8,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Jacobi",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          }
+        ]
+      },
+      {
+        "nombre": "Minimos Cuadrados",
+        "posicion": [
+          0.8488,
+          0.7
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa4.jpg",
+        "musica": "assets\\musica\\subMapa4.wav",
+        "niveles": [
+          {
+            "nombre": "Linea Recta",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Cuadratica",
+            "posicion": [
+              0.4,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Cubica",
+            "posicion": [
+              0.6,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Lineal con Funcion",
+            "posicion": [
+              0.8,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Cuadratica con Funcion",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          }
+        ]
+      },
+      {
+        "nombre": "Integracion Numerica",
+        "posicion": [
+          0.5475,
+          0.8244
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa5.jpg",
+        "musica": "assets\\musica\\subMapa5.wav",
+        "niveles": [
+          {
+            "nombre": "Regla Trapezoidal",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Regla 1/3 de Simpson",
+            "posicion": [
+              0.4,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Regla 3/8 de Simpson",
+            "posicion": [
+              0.6,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton-Cotes Cerradas",
+            "posicion": [
+              0.8,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Newton-Cotes Abiertas",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          }
+        ]
+      },
+      {
+        "nombre": "Ecuaciones Diferenciales Ordinarias",
+        "posicion": [
+          0.2037,
+          0.7322
+        ],
+        "estado": "disponible",
+        "fondo": "assets\\fondos\\subMapa6.jpg",
+        "musica": "assets\\musica\\subMapa6.wav",
+        "niveles": [
+          {
+            "nombre": "Euler Modificado",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Euler Hacia Atras",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Euler Hacia Adelante",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Runge-Kutta 2°Orden",
+            "posicion": [
+              0.4,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Runge-Kutta 3°Orden",
+            "posicion": [
+              0.6,
+              0.3
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Runge-Kutta 4°Orden por 1/3 de Simpson",
+            "posicion": [
+              0.8,
+              0.65
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Runge-Kutta 4°Orden por 3/8 de Simpson",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          },
+          {
+            "nombre": "Runge-Kutta Orden Superior",
+            "posicion": [
+              0.5,
+              0.85
+            ],
+            "estado": "disponible"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "titulo": "Eliminación Gaussiana",
+  "generador": "eliminacion_gaussiana",
+  "parametros": {"tam": 3},
+  "tiempo": 720,
+  "decimales": 4,
+  "instruccion": "Resuelva el sistema de {tam} ecuaciones mediante eliminación de Gauss. Puede escribir fracciones (7/3) o decimales.",
+  "intro": [
+    "Sistema:",
+    {"repetir": "ecuaciones", "como": "ec", "texto": "    {ec}"}
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Escriba la matriz aumentada [A | b]:",
+      "filas": [
+        [{"matriz": "Ab", "casillas": "todas"}]
+      ]
+    },
+    {
+      "repetir": "etapas", "como": "et",
+      "paso": {
+        "titulo": "Paso {paso}. Haga ceros debajo del pivote de la columna {et.columna}: {et.operaciones}",
+        "filas": [
+          [{"matriz": "et.matriz", "casillas": "et.editables", "decimales": 4}]
+        ]
+      }
+    },
+    {
+      "repetir": "sustitucion", "como": "s",
+      "paso": {
+        "titulo": "Paso {paso}. Sustitución hacia atrás. Despeje {s.variable}:",
+        "filas": [
+          ["{s.variable} = {s.formula} =", {"in": "s.valor"}]
+        ]
+      }
+    }
+  ]
+}

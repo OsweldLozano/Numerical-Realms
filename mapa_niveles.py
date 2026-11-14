@@ -18,11 +18,20 @@ Estados de cada botón (todos son "disponible" salvo que tú indiques otra cosa)
 Como los botones no llevan número, al pasar el ratón aparece una etiqueta con el
 nombre del nivel (usa `nombres=[...]`; si no, "Nivel n").
 
+Fondo y posiciones:
+    El mapa se dibuja en la resolución lógica de ventana.py (1600x900, 16:9) y el fondo se
+    muestra COMPLETO, sin recortes (debe ser 16:9; lo ideal es 1600x900). Así las
+    posiciones [x, y] (fracciones de 0 a 1) son fracciones de la imagen y los botones
+    caen en el mismo punto del dibujo en cualquier monitor.
+
 Teclas:
+    F11  -> pantalla completa <-> ventana
     Esc  -> "volver" (por ejemplo, al menú de inicio)
     F2   -> modo edición: arrastra los botones sobre tu fondo (en este modo SÍ se
             muestra el número de cada uno, para que sepas cuál es cuál) y pulsa S
-            para guardar las posiciones en posiciones_mapa.json.
+            para guardar las posiciones. Dentro del juego completo (numerical_realms.py)
+            se guardan en el archivo central estructura.json; usado solo, en
+            posiciones_mapa.json.
 
 Uso:
     python mapa_niveles.py
@@ -41,14 +50,15 @@ import random
 
 import pygame
 
+import ventana
 from pantalla_inicio import (
-    ANCHO, ALTO, MARGEN, TAM_ICONO, BotonIcono, cargar_svg, cubrir, fondo_respaldo,
+    ANCHO, ALTO, MARGEN, TAM_ICONO, BotonIcono, cargar_svg, contener, fondo_respaldo,
     icono_respaldo, ruta, RUTA_SVG_OPCIONES, RUTA_SVG_SONIDO, RUTA_SVG_SILENCIO,
 )
 
 # ----------------------------------------------------------------- configuración
 TOTAL_NIVELES = 34
-DIAMETRO = 62                    # diámetro de cada botón circular
+DIAMETRO = 78                    # diámetro de cada botón circular (píxeles lógicos, 1600x900)
 RUTA_FONDO = ruta("fondo_mapa.jpg")
 RUTA_POSICIONES = ruta("posiciones_mapa.json")
 OSCURECER = 0                    # 0-255: velo negro sobre el fondo
@@ -61,38 +71,70 @@ ESTILOS = {   # (relleno, borde)
 
 
 # ------------------------------------------------------------------ posiciones
-def posiciones_por_defecto(total, semilla=11):
+def posiciones_por_defecto(total, semilla=11, fijas=None):
     """Reparto libre y parejo (algoritmo del "mejor candidato": cada botón nuevo se coloca
     en el punto más alejado de los ya puestos). Devuelve [[x, y], ...] en fracciones (0 a 1).
-    Es determinista: siempre sale la misma distribución."""
+    Es determinista: siempre sale la misma distribución.
+
+    `fijas`: lista opcional de `total` elementos; cada uno es [x, y] si ese botón ya tiene
+    posición, o None si hay que calcularla. Las fijas se respetan tal cual y las demás se
+    reparten esquivándolas."""
     rng = random.Random(semilla)
     r = DIAMETRO // 2 + 14
+    fijas = (list(fijas) + [None] * total)[:total] if fijas else [None] * total
+    res = [None] * total
     pts = []
-    for _ in range(total):
+    for i, p in enumerate(fijas):
+        if p is not None:
+            res[i] = [float(p[0]), float(p[1])]
+            pts.append((res[i][0] * ANCHO, res[i][1] * ALTO))
+    for i in range(total):
+        if res[i] is not None:
+            continue
         mejor, mejor_d = None, -1.0
         for _ in range(60):
-            x, y = rng.uniform(r, ANCHO - r), rng.uniform(55, ALTO - r)
-            if y < 125 and (x < 135 or x > ANCHO - 135):      # no tapar los íconos de las esquinas
+            x, y = rng.uniform(r, ANCHO - r), rng.uniform(70, ALTO - r)
+            if y < 155 and (x < 170 or x > ANCHO - 170):      # no tapar los íconos de las esquinas
                 continue
             d = min((math.hypot(x - qx, y - qy) for qx, qy in pts), default=1e9)
             if d > mejor_d:
                 mejor, mejor_d = (x, y), d
+        if mejor is None:
+            mejor = (ANCHO / 2, ALTO / 2)
         pts.append(mejor)
-    return [[x / ANCHO, y / ALTO] for x, y in pts]
+        res[i] = [mejor[0] / ANCHO, mejor[1] / ALTO]
+    return res
+
+
+def completar_posiciones(entradas, total, semilla=11):
+    """Convierte una lista de posiciones posiblemente incompleta en `total` posiciones.
+    Las entradas válidas ([x, y] con valores entre 0 y 1) se respetan; las demás
+    (None, faltantes o inválidas) se reparten automáticamente."""
+    if not isinstance(entradas, (list, tuple)):
+        entradas = []
+    fijas = []
+    for i in range(total):
+        p = entradas[i] if i < len(entradas) else None
+        try:
+            x, y = float(p[0]), float(p[1])
+            valida = 0 <= x <= 1 and 0 <= y <= 1
+        except (TypeError, ValueError, IndexError):
+            valida = False
+        fijas.append([x, y] if valida else None)
+    return posiciones_por_defecto(total, semilla, fijas)
 
 
 def cargar_posiciones(total, ruta_pos=None, semilla=11):
+    """Lee posiciones de un JSON {"posiciones": [[x, y], ...]}; lo que falte se reparte solo."""
     ruta_pos = ruta_pos or RUTA_POSICIONES
-    pos = posiciones_por_defecto(total, semilla)
+    entradas = []
     if os.path.exists(ruta_pos):
         try:
             with open(ruta_pos, encoding="utf-8") as f:
-                datos = json.load(f)["posiciones"]
-            for i, p in enumerate(datos[:total]):
-                pos[i] = [float(p[0]), float(p[1])]
-        except (OSError, ValueError, KeyError, TypeError, IndexError) as e:
+                entradas = json.load(f)["posiciones"]
+        except (OSError, ValueError, KeyError, TypeError) as e:
             print(f"No pude leer {ruta_pos} ({e}); uso las posiciones por defecto.")
-    return pos
+    return completar_posiciones(entradas, total, semilla)
 
 
 # --------------------------------------------------------------------- dibujo
@@ -113,15 +155,16 @@ def aclarar(color, n=18):
 
 def dibujar_palomita(s, cx, cy):
     pygame.draw.lines(s, (255, 255, 255), False,
-                      [(cx - 12, cy + 1), (cx - 4, cy + 9), (cx + 13, cy - 9)], 6)
+                      [(cx - 15, cy + 1), (cx - 5, cy + 11), (cx + 16, cy - 11)], 7)
 
 
 def dibujar_candado(s, cx, cy):
-    pygame.draw.arc(s, (210, 210, 220), (cx - 8, cy - 17, 16, 20), 0, math.pi, 3)
-    pygame.draw.line(s, (210, 210, 220), (cx - 8, cy - 7), (cx - 8, cy - 1), 3)
-    pygame.draw.line(s, (210, 210, 220), (cx + 7, cy - 7), (cx + 7, cy - 1), 3)
-    pygame.draw.rect(s, (210, 210, 220), (cx - 12, cy - 2, 24, 18), border_radius=4)
-    pygame.draw.circle(s, (72, 74, 88), (cx, cy + 6), 3)
+    c = (210, 210, 220)
+    pygame.draw.arc(s, c, (cx - 10, cy - 21, 20, 25), 0, math.pi, 4)
+    pygame.draw.line(s, c, (cx - 10, cy - 9), (cx - 10, cy - 1), 4)
+    pygame.draw.line(s, c, (cx + 9, cy - 9), (cx + 9, cy - 1), 4)
+    pygame.draw.rect(s, c, (cx - 15, cy - 3, 30, 22), border_radius=5)
+    pygame.draw.circle(s, (72, 74, 88), (cx, cy + 8), 4)
 
 
 def cargar_fondo(tam, rutas=None):
@@ -134,7 +177,7 @@ def cargar_fondo(tam, rutas=None):
     for r in rutas:
         if os.path.exists(r):
             try:
-                fondo = cubrir(pygame.image.load(r).convert(), tam)
+                fondo = contener(pygame.image.load(r).convert(), tam)
                 break
             except pygame.error as e:
                 print(f"No pude leer {r}: {e}")
@@ -151,14 +194,18 @@ def cargar_fondo(tam, rutas=None):
 class MapaNiveles:
     def __init__(self, pantalla=None, total=TOTAL_NIVELES, completados=(), bloqueados=(),
                  nombres=None, sonido=True, titulo="Mapa de niveles",
-                 ruta_fondo=None, ruta_posiciones=None, semilla=11):
+                 ruta_fondo=None, ruta_posiciones=None, semilla=11,
+                 posiciones=None, al_guardar=None):
         """total: cuántos botones hay. completados / bloqueados: números de botón (1..total).
         ruta_fondo: ruta o lista de alternativas para el JPG.
-        ruta_posiciones: JSON donde se guardan las posiciones (modo edición).
-        semilla: cambia el reparto por defecto de los botones."""
-        pygame.init()
+        semilla: cambia el reparto automático de los botones.
+        posiciones: lista de [x, y] (fracciones 0-1) o None por botón; los None se reparten
+            solos esquivando los que sí tienen posición.
+        al_guardar: función que recibe la lista de posiciones cuando se pulsa S en el modo
+            edición. Si no se da, se guardan en `ruta_posiciones` (modo antiguo, sin estructura).
+        ruta_posiciones: JSON de posiciones que se usa cuando no se pasa `posiciones`."""
+        self.pantalla = pantalla or ventana.obtener_pantalla()
         pygame.display.set_caption(titulo)
-        self.pantalla = pantalla or pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
         self.w, self.h = self.pantalla.get_size()
         self.total = total
@@ -168,8 +215,13 @@ class MapaNiveles:
         self.sonido = sonido
 
         self.ruta_posiciones = ruta_posiciones or RUTA_POSICIONES
+        self.al_guardar = al_guardar
         self.fondo = cargar_fondo((self.w, self.h), ruta_fondo)
-        self.pos = cargar_posiciones(total, self.ruta_posiciones, semilla)
+        if posiciones is not None:
+            self.pos = completar_posiciones(posiciones, total, semilla)
+        else:
+            self.pos = cargar_posiciones(total, self.ruta_posiciones, semilla)
+        self.mensaje, self.mensaje_t = "", 0.0       # aviso temporal (p. ej. "Guardado")
 
         self.img_opciones = cargar_svg(RUTA_SVG_OPCIONES, TAM_ICONO) or icono_respaldo("opciones", TAM_ICONO)
         self.img_sonido = cargar_svg(RUTA_SVG_SONIDO, TAM_ICONO) or icono_respaldo("sonido", TAM_ICONO)
@@ -182,8 +234,8 @@ class MapaNiveles:
         for estado, (rel, bor) in ESTILOS.items():
             self.circulos[(estado, False)] = crear_circulo(DIAMETRO, rel, bor)
             self.circulos[(estado, True)] = crear_circulo(DIAMETRO, aclarar(rel), bor)
-        self.f_num = pygame.font.SysFont("arial", 24, bold=True)    # solo en modo edición
-        self.f_tip = pygame.font.SysFont("arial", 18)
+        self.f_num = pygame.font.SysFont("arial", 30, bold=True)    # solo en modo edición
+        self.f_tip = pygame.font.SysFont("arial", 22)
 
         self.editando = False
         self.arrastrando = None
@@ -224,15 +276,24 @@ class MapaNiveles:
         return None
 
     def guardar_posiciones(self):
-        with open(self.ruta_posiciones, "w", encoding="utf-8") as f:
-            json.dump({"posiciones": [[round(x, 4), round(y, 4)] for x, y in self.pos]}, f, indent=2)
-        print("Posiciones guardadas en", self.ruta_posiciones)
+        pos = [[round(x, 4), round(y, 4)] for x, y in self.pos]
+        if self.al_guardar is not None:
+            self.al_guardar(pos)              # p. ej. escribir en el archivo central de estructura
+            destino = "estructura"
+        else:
+            with open(self.ruta_posiciones, "w", encoding="utf-8") as f:
+                json.dump({"posiciones": pos}, f, indent=2)
+            destino = os.path.basename(self.ruta_posiciones)
+        print("Posiciones guardadas en", destino)
+        self.mensaje, self.mensaje_t = f"Posiciones guardadas ({destino})", 2.5
 
     # ----------------------------------------------------------------- eventos
     def procesar(self, ev):
         """Devuelve ("nivel", n), "opciones", "volver", "salir" o None."""
         if ev.type == pygame.QUIT:
             return "salir"
+        if ventana.tecla_global(ev):
+            return None
         if ev.type == pygame.KEYDOWN:
             if ev.key == pygame.K_ESCAPE:
                 return "volver"
@@ -292,6 +353,13 @@ class MapaNiveles:
             self.dibujar_tooltip(sobre)
         if self.editando:
             self.dibujar_banner()
+        if self.mensaje_t > 0:
+            self.mensaje_t -= dt
+            img = self.f_tip.render(self.mensaje, True, (255, 255, 255))
+            caja = img.get_rect().inflate(28, 14)
+            caja.midbottom = (self.w // 2, self.h - 14)
+            pygame.draw.rect(s, (30, 120, 70), caja, border_radius=10)
+            s.blit(img, img.get_rect(center=caja.center))
         pygame.display.flip()
 
     def dibujar_tooltip(self, n):
@@ -317,6 +385,8 @@ class MapaNiveles:
     def ejecutar(self):
         while True:
             dt = self.reloj.tick(60) / 1000.0
+            if ventana.sin_foco():               # el jugador se fue a otra ventana
+                return "salir"
             for ev in pygame.event.get():
                 accion = self.procesar(ev)
                 if accion:

@@ -2,12 +2,15 @@
 Pantalla de inicio: título central, botones Iniciar / Salir y dos íconos
 superiores (opciones y sonido).
 
-Archivos que busca junto a este script (todos reemplazables):
-    fondo_inicio.jpg        fondo (se escala para cubrir la ventana sin deformarse)
-    icono_opciones.svg      ícono de opciones (esquina superior izquierda)
-    icono_sonido.svg        ícono de sonido activo (esquina superior derecha)
-    icono_sonido_off.svg    ícono de sonido silenciado
-    fuente.ttf              (opcional) tipografía del título
+Archivos que busca (todos reemplazables):
+    assets/fondos/inicio.jpg             fondo (ideal 1600x900; se escala para cubrir la pantalla)
+    assets/iconos/opciones.svg           ícono de opciones (esquina superior izquierda)
+    assets/iconos/sonido.svg             ícono de sonido activo (esquina superior derecha)
+    assets/iconos/sonido_off.svg         ícono de sonido silenciado
+    assets/tipografia/JacquesFrancois.ttf  (opcional) tipografía del título
+
+La pantalla se dibuja en la resolución lógica de ventana.py (1600x900) y pygame la
+escala al monitor. F11 alterna pantalla completa / ventana.
 
 Si falta el JPG se dibuja un degradado; si falla un SVG se dibuja un ícono simple.
 
@@ -35,13 +38,15 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton
 
+import ventana
+from ventana import ANCHO, ALTO
+
 """  configuración  """
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 def ruta(nombre):
     return os.path.join(BASE, nombre)
 
-ANCHO, ALTO = 1024, 720
 TITULO = "Numerical Realms"
 RUTA_FONDO = ruta(Path(__file__).parent / "assets" /"fondos" / "inicio.jpg")
 RUTA_SVG_OPCIONES = ruta(Path(__file__).parent / "assets" /"iconos" / "opciones.svg")
@@ -49,12 +54,13 @@ RUTA_SVG_SONIDO = ruta(Path(__file__).parent / "assets" /"iconos" / "sonido.svg"
 RUTA_SVG_SILENCIO = ruta(Path(__file__).parent / "assets" /"iconos" / "sonido_off.svg")
 RUTA_FUENTE = ruta(Path(__file__).parent / "assets" /"tipografia" / "JacquesFrancois.ttf")
 
-TAM_ICONO = 60           # lado en píxeles de los íconos SVG
-MARGEN = 18              # separación de los íconos con los bordes
-TAM_TITULO = 96
-GROSOR_CONTORNO = 3
+# Medidas en píxeles de la resolución lógica (1600x900)
+TAM_ICONO = 75           # lado de los íconos SVG
+MARGEN = 22              # separación de los íconos con los bordes
+TAM_TITULO = 120
+GROSOR_CONTORNO = 4
 OSCURECER = 0            # 0-255: velo negro sobre el fondo (sube si el título no se lee)
-BOTON_W, BOTON_H, BOTON_SEP = 190, 60, 16
+BOTON_W, BOTON_H, BOTON_SEP = 238, 75, 20
 
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
@@ -66,8 +72,8 @@ THEME = {
             "normal_text": "#49454F", "hovered_text": "#2B2833", "active_text": "#2B2833",
             "normal_border": "#E8DEF8", "hovered_border": "#D9CCF2", "active_border": "#C7B6EA",
         },
-        "font": {"name": "noto_sans", "size": "22"},
-        "misc": {"shape": "rounded_rectangle", "shape_corner_radius": "14", "border_width": "0"},
+        "font": {"name": "noto_sans", "size": "28"},
+        "misc": {"shape": "rounded_rectangle", "shape_corner_radius": "18", "border_width": "0"},
     }
 }
 
@@ -115,6 +121,24 @@ def cubrir(img, tam):
     esc = max(tam[0] / iw, tam[1] / ih)
     nuevo = pygame.transform.smoothscale(img, (math.ceil(iw * esc), math.ceil(ih * esc)))
     surf = pygame.Surface(tam)
+    surf.blit(nuevo, nuevo.get_rect(center=(tam[0] // 2, tam[1] // 2)))
+    return surf
+
+
+def contener(img, tam):
+    """Escala `img` para que se vea COMPLETA dentro de `tam`, sin deformarla ni recortarla.
+    Para los fondos de los mapas, donde los botones deben coincidir con el dibujo.
+    Si la proporción de la imagen no es la de la pantalla (16:9), los huecos se rellenan
+    con la misma imagen ampliada y oscurecida."""
+    iw, ih = img.get_size()
+    if (iw, ih) == tuple(tam):
+        return img.copy()
+    surf = cubrir(img, tam)                       # relleno para los huecos
+    velo = pygame.Surface(tam, pygame.SRCALPHA)
+    velo.fill((0, 0, 0, 170))
+    surf.blit(velo, (0, 0))
+    esc = min(tam[0] / iw, tam[1] / ih)
+    nuevo = pygame.transform.smoothscale(img, (round(iw * esc), round(ih * esc)))
     surf.blit(nuevo, nuevo.get_rect(center=(tam[0] // 2, tam[1] // 2)))
     return surf
 
@@ -204,9 +228,8 @@ class BotonIcono:
 # ---------------------------------------------------------------- pantalla
 class PantallaInicio:
     def __init__(self, pantalla=None, sonido=True):
-        pygame.init()
+        self.pantalla = pantalla or ventana.obtener_pantalla()
         pygame.display.set_caption(TITULO)
-        self.pantalla = pantalla or pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
         w, h = self.pantalla.get_size()
         self.sonido = sonido
@@ -241,6 +264,8 @@ class PantallaInicio:
         """Devuelve "iniciar", "salir", "opciones" o None."""
         if ev.type == pygame.QUIT:
             return "salir"
+        if ventana.tecla_global(ev):
+            return None
         if ev.type == pygame.KEYDOWN:
             if ev.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                 return "iniciar"
@@ -273,6 +298,8 @@ class PantallaInicio:
     def ejecutar(self):
         while True:
             dt = self.reloj.tick(60) / 1000.0
+            if ventana.sin_foco():               # el jugador se fue a otra ventana
+                return "salir"
             for ev in pygame.event.get():
                 accion = self.procesar(ev)
                 if accion:
