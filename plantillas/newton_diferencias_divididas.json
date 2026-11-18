@@ -1,0 +1,40 @@
+{
+  "titulo": "Newton Diferencias Divididas",
+  "generador": "newton_diferencias_divididas",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Calcule g({x}) con el método de Newton con diferencias divididas usando la tabla de {n} puntos (no están igualmente espaciados).",
+  "intro": [
+    "g(x) = y0 + f[x0,x1](x - x0) + f[x0,x1,x2](x - x0)(x - x1) + ...",
+    "f[xi,...,xj] = (f[xi+1,...,xj] - f[xi,...,xj-1]) / (xj - xi)",
+    "Datos:  x = {x}",
+    {"repetir": "tabla", "como": "p", "texto": "x{idx} = {p[0]}        y{idx} = {p[1]}"}
+  ],
+  "pasos": [
+    {
+      "repetir": "ordenes", "como": "o",
+      "paso": {
+        "titulo": "Paso {paso}. Diferencias divididas de orden {o.k}:",
+        "filas": [
+          {"repetir": "o.valores", "como": "d", "fila": ["{d.etiqueta} = ({d.y1} - {par(d.y0)}) / ({d.x1} - {par(d.x0)}) =", {"in": "d.valor"}]}
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Calcule cada término (coeficiente · factor):",
+      "filas": [
+        {"repetir": "g_x.operacion", "como": "op", "fila": [
+          "{op.simbolo} · {op.formula}:   coef. =", {"in": "op.coeficiente"},
+          " factor =", {"in": "op.factor"},
+          " término =", {"in": "op.valor", "tol": 0.005}
+        ]}
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Sume los términos:",
+      "filas": [
+        ["g({x}) =", {"in": "g_x.valor", "tol": 0.01}]
+      ]
+    }
+  ]
+}

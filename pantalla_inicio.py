@@ -53,6 +53,7 @@ RUTA_SVG_OPCIONES = ruta(Path(__file__).parent / "assets" /"iconos" / "opciones.
 RUTA_SVG_SONIDO = ruta(Path(__file__).parent / "assets" /"iconos" / "sonido.svg")
 RUTA_SVG_SILENCIO = ruta(Path(__file__).parent / "assets" /"iconos" / "sonido_off.svg")
 RUTA_FUENTE = ruta(Path(__file__).parent / "assets" /"tipografia" / "JacquesFrancois.ttf")
+RUTA_MUSICA = ruta(Path(__file__).parent / "assets" / "musica" / "inicio.wav")
 
 # Medidas en píxeles de la resolución lógica (1600x900)
 TAM_ICONO = 75           # lado de los íconos SVG
@@ -309,6 +310,12 @@ class PantallaInicio:
 
 if __name__ == "__main__":
     inicio = PantallaInicio()
+    try:                                     # en el juego la reproduce numerical_realms.py
+        pygame.mixer.music.load(RUTA_MUSICA)
+        pygame.mixer.music.play(-1)
+        inicio.aplicar_sonido()
+    except (pygame.error, OSError) as e:
+        print(f"No pude reproducir {RUTA_MUSICA}: {e}")
     while True:
         accion = inicio.ejecutar()
         if accion == "opciones":

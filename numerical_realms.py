@@ -45,11 +45,19 @@ Pantalla:
     Si el jugador cambia a otra ventana o minimiza el juego, se cierra solo (guardando el
     progreso). Ver ventana.py.
 
+Pantallas de historia (fondos a pantalla completa que se quitan con cualquier tecla o clic;
+rutas en estructura.json, ver estructura.py):
+    "Iniciar" -> historia -> mapa general
+    nivel: inicio -> guia -> el nivel -> (si se completa) final -> imagen -> submapa
+    Durante el nivel, G vuelve a mostrar la guía. Si se acaba el tiempo, "Reintentar"
+    regresa al submapa (al volver a entrar hay un problema nuevo y otra vez inicio y guía).
+
 Música:
     El mapa general suena con "musica" del mapa; cada submapa con la suya (si no tiene, sigue
     la del mapa). Dentro de un nivel sigue sonando la del submapa, y al volver al mapa general
     se retoma la del mapa. Una pista que ya está sonando no se reinicia. El ícono de sonido
-    silencia/activa la música en todas las pantallas. El inicio no tiene música.
+    silencia/activa la música en todas las pantallas. La pantalla de inicio usa
+    RUTA_MUSICA de pantalla_inicio.py, que sigue sonando en la pantalla de historia.
 
 Modo edición de posiciones (F2 en el mapa general o en un submapa):
     Arrastra los botones y pulsa S: las posiciones se escriben en estructura.json.
@@ -66,6 +74,7 @@ import estructura as est_mod
 import mapa_niveles
 import ventana
 import nivel_generico
+import pantalla_imagen
 import pantalla_inicio
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -166,10 +175,13 @@ def ejecutar_juego(est, ruta_progreso=RUTA_PROGRESO):
         comp = progreso["completados"]
 
         if escena == "inicio":
+            musica.reproducir(pantalla_inicio.RUTA_MUSICA, progreso["sonido"])
             actual = pantalla_inicio.PantallaInicio(pantalla, sonido=progreso["sonido"])
             r = actual.ejecutar()
             progreso["sonido"] = actual.sonido
             if r == "iniciar":
+                if pantalla_imagen.mostrar(pantalla, est.historia) == "salir":
+                    break
                 escena = "mapa"
             elif r == "salir":
                 break
@@ -232,17 +244,19 @@ def ejecutar_juego(est, ruta_progreso=RUTA_PROGRESO):
 
         elif escena == "nivel":
             nivel = est.submapas[ks].niveles[kn]
-            contenido, regenerar = nivel.contenido, None
+            contenido = nivel.contenido
             if constructor_niveles.es_plantilla(contenido):
-                # problema nuevo cada vez que se abre el nivel (y en cada "Reintentar")
-                regenerar = lambda p=contenido: constructor_niveles.generar_nivel(p)  # noqa: E731
+                # problema nuevo cada vez que se abre el nivel
                 try:
-                    contenido = regenerar()
+                    contenido = constructor_niveles.generar_nivel(contenido)
                 except Exception as e:
                     print(f"No pude generar el nivel {nivel.nombre!r}: {e}")
                     escena = "submapa"
                     continue
-            actual = nivel_generico.Juego([contenido], modo_mapa=True, regenerar=regenerar,
+            pant = nivel.pantallas
+            if pantalla_imagen.mostrar_varias(pantalla, [pant["inicio"], pant["guia"]]) == "salir":
+                break
+            actual = nivel_generico.Juego([contenido], modo_mapa=True, guia=pant["guia"],
                                           sonido=progreso["sonido"], pantalla=pantalla)
             r = actual.ejecutar()
             progreso["sonido"] = actual.sonido
@@ -251,6 +265,10 @@ def ejecutar_juego(est, ruta_progreso=RUTA_PROGRESO):
             guardar_progreso(ruta_progreso, progreso)
             if r == "salir":
                 break
+            if r == "completado":
+                pygame.event.clear()
+                if pantalla_imagen.mostrar_varias(pantalla, [pant["final"], pant["imagen"]]) == "salir":
+                    break
             escena = "submapa"
 
         guardar_progreso(ruta_progreso, progreso)

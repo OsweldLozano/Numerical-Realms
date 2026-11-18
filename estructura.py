@@ -5,6 +5,7 @@ FORMATO
 -------
 {
   "mapa": {                                  # el mapa general
+    "historia": "assets/historia/historia.jpg",  # opcional: pantalla que sale al presionar "Iniciar"
     "fondo":  "assets/fondos/mapa.jpg",      # opcional: imagen de fondo
     "musica": "assets/musica/musica1.wav",   # opcional: música (se repite en bucle)
     "subMapas": [                            # un botón del mapa general por cada elemento
@@ -18,7 +19,11 @@ FORMATO
           {
             "nombre":   "Interpolacion Lineal",     # obligatorio; enlaza con el "titulo" del nivel
             "posicion": [0.30, 0.50],               # opcional: botón dentro del submapa
-            "estado":   "disponible"                # opcional (por defecto "disponible")
+            "estado":   "disponible",               # opcional (por defecto "disponible")
+            "inicio":   "assets/historia/lineal_inicio.jpg",  # opcional: historia antes del nivel
+            "guia":     "assets/guias/lineal.jpg",            # opcional: guía (también con G en el nivel)
+            "final":    "assets/historia/lineal_final.jpg",   # opcional: fin de la historia (al completarlo)
+            "imagen":   "assets/imagenes/lineal.jpg"          # opcional: imagen de recompensa (al completarlo)
           }
         ]
       },
@@ -31,6 +36,10 @@ REGLAS
 ------
 * Las rutas pueden usar / o \\ y son relativas a la carpeta donde está este archivo
   (también se aceptan rutas absolutas). Si un archivo no existe se avisa y se ignora.
+* PANTALLAS DE IMAGEN ("historia" y, en cada nivel, "inicio", "guia", "final", "imagen"):
+  un fondo a pantalla completa (lo ideal: .jpg de 1600x900) que se quita al presionar
+  cualquier tecla o hacer clic. Orden en un nivel: inicio -> guia -> el nivel -> (solo si se
+  completa) final -> imagen -> submapa. Si falta alguna, esa pantalla simplemente se salta.
 * "posicion" son fracciones del ancho y del alto de la ventana (0 = izquierda/arriba,
   1 = derecha/abajo). Si falta, el botón se reparte automáticamente. Si varios botones
   del mismo mapa tienen exactamente la misma posición, el primero se queda donde está y
@@ -51,6 +60,7 @@ import re
 import unicodedata
 
 ESTADOS = ("bloqueado", "disponible", "completado")
+PANTALLAS_NIVEL = ("inicio", "guia", "final", "imagen")
 
 
 # ------------------------------------------------------------------ estructuras
@@ -62,6 +72,7 @@ class Nivel:
         self.raw = raw                # el diccionario original del JSON (para guardar)
         self.clave = clave            # "Submapa/Nivel": identifica al nivel en el progreso
         self.contenido = None         # definición del nivel (se asigna en vincular_contenido)
+        self.pantallas = {}           # {"inicio": ruta, "guia": ..., "final": ..., "imagen": ...}
 
 
 class SubMapa:
@@ -83,6 +94,7 @@ class Estructura:
         self.datos = datos
         self.fondo = None
         self.musica = None
+        self.historia = None          # pantalla que sale al presionar "Iniciar"
         self.submapas = []
         self.avisos = []              # cosas que no impiden jugar pero conviene revisar
 
@@ -129,7 +141,7 @@ def _leer_posicion(d, ruta):
 
 
 def _leer_archivo(d, clave, ruta, est):
-    """Ruta de un archivo (fondo o música) ya resuelta. Si no existe, avisa y devuelve None."""
+    """Ruta de un archivo (fondo, música o imagen) ya resuelta. Si no existe, avisa y devuelve None."""
     v = d.get(clave)
     if v is None:
         return None
@@ -182,6 +194,7 @@ def cargar_estructura(ruta_json):
     mapa = datos["mapa"]
     est.fondo = _leer_archivo(mapa, "fondo", "mapa", est)
     est.musica = _leer_archivo(mapa, "musica", "mapa", est)
+    est.historia = _leer_archivo(mapa, "historia", "mapa", est)
 
     subs = mapa.get("subMapas")
     if not (isinstance(subs, list) and subs):
@@ -217,7 +230,10 @@ def cargar_estructura(ruta_json):
             if normalizar(nom) in vistos:
                 _err(f"{rn}.nombre", f"el nombre {nom!r} está repetido dentro de este submapa")
             vistos.add(normalizar(nom))
-            niveles.append(Nivel(nom, _leer_posicion(n, rn), _leer_estado(n, rn), n, f"{nombre}/{nom}"))
+            nivel = Nivel(nom, _leer_posicion(n, rn), _leer_estado(n, rn), n, f"{nombre}/{nom}")
+            for clave in PANTALLAS_NIVEL:
+                nivel.pantallas[clave] = _leer_archivo(n, clave, rn, est)
+            niveles.append(nivel)
 
         sub = SubMapa(k, nombre, _leer_posicion(s, rs), _leer_estado(s, rs),
                       _leer_archivo(s, "fondo", rs, est), _leer_archivo(s, "musica", rs, est),

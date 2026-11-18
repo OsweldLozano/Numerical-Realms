@@ -1,13 +1,14 @@
 {
   "mapa": {
+    "historia": "assets\\historia\\prologo.jpg",
     "fondo": "assets\\fondos\\mapa.jpg",
     "musica": "assets\\musica\\mapa.wav",
     "subMapas": [
       {
         "nombre": "Interpolacion",
         "posicion": [
-          0.2075,
-          0.2933
+          0.2125,
+          0.3067
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa1.jpg",
@@ -16,10 +17,14 @@
           {
             "nombre": "Interpolacion Lineal",
             "posicion": [
-              0.3069,
-              0.3578
+              0.3038,
+              0.3589
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto1-1A.jpg",
+            "guia":   "assets\\guias\\interpolacion\\interpolacionLineal.jpg",
+            "final":  "assets\\historia\\acto1-1B.jpg",
+            "imagen": "assets\\imagenes\\acto1-1.jpg"
           },
           {
             "nombre": "Newton Hacia Adelante",
@@ -27,39 +32,55 @@
               0.5312,
               0.3861
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto1-2A.jpg",
+            "guia":   "assets\\guias\\interpolacion\\newtonHaciaAdelante.jpg",
+            "final":  "assets\\historia\\acto1-2B.jpg",
+            "imagen": "assets\\imagenes\\acto1-2.jpg"
           },
           {
             "nombre": "Newton Hacia Atras",
             "posicion": [
-              0.8525,
-              0.5411
+              0.8456,
+              0.5233
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto1-3A.jpg",
+            "guia":   "assets\\guias\\interpolacion\\newtonHaciaAtras.jpg",
+            "final":  "assets\\historia\\acto1-3B.jpg",
+            "imagen": "assets\\imagenes\\acto1-3.jpg"
           },
           {
             "nombre": "Newton Diferencias Divididas",
             "posicion": [
-              0.6375,
-              0.7144
+              0.6425,
+              0.71
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto1-4A.jpg",
+            "guia":   "assets\\guias\\interpolacion\\newtonDiferenciasDividida.jpg",
+            "final":  "assets\\historia\\acto1-4B.jpg",
+            "imagen": "assets\\imagenes\\acto1-4.jpg"
           },
           {
             "nombre": "Lagrange",
             "posicion": [
-              0.1913,
-              0.8289
+              0.1963,
+              0.8211
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto1-5A.jpg",
+            "guia":   "assets\\guias\\interpolacion\\lagrange.jpg",
+            "final":  "assets\\historia\\acto1-5B.jpg",
+            "imagen": "assets\\imagenes\\acto1-5.jpg"
           }
         ]
       },
       {
         "nombre": "Ecuaciones No Lineales",
         "posicion": [
-          0.5138,
-          0.38
+          0.5205,
+          0.3958
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa2.jpg",
@@ -71,7 +92,11 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-1A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\grafica.jpg",
+            "final":  "assets\\historia\\acto2-1B.jpg",
+            "imagen": "assets\\imagenes\\acto2-1.jpg"
           },
           {
             "nombre": "Bisectriz",
@@ -79,7 +104,11 @@
               0.4,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-2A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\bisectriz.jpg",
+            "final":  "assets\\historia\\acto2-2B.jpg",
+            "imagen": "assets\\imagenes\\acto2-2.jpg"
           },
           {
             "nombre": "Newton Raphson",
@@ -87,15 +116,23 @@
               0.6,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-3A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\newtonRaphson.jpg",
+            "final":  "assets\\historia\\acto2-3B.jpg",
+            "imagen": "assets\\imagenes\\acto2-3.jpg"
           },
           {
-            "nombre": "Punto fijo",
+            "nombre": "Punto Fijo",
             "posicion": [
               0.8,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-4A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\puntoFijo.jpg",
+            "final":  "assets\\historia\\acto2-4B.jpg",
+            "imagen": "assets\\imagenes\\acto2-4.jpg"
           },
           {
             "nombre": "Falsa Posición",
@@ -103,7 +140,11 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-5A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\falsaPosicion.jpg",
+            "final":  "assets\\historia\\acto2-5B.jpg",
+            "imagen": "assets\\imagenes\\acto2-5.jpg"
           },
           {
             "nombre": "Secante",
@@ -111,15 +152,19 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto2-6A.jpg",
+            "guia":   "assets\\guias\\ecuacionesNoLineales\\secante.jpg",
+            "final":  "assets\\historia\\acto2-6B.jpg",
+            "imagen": "assets\\imagenes\\acto2-6.jpg"
           }
         ]
       },
       {
         "nombre": "Ecuaciones Lineales",
         "posicion": [
-          0.8581,
-          0.2911
+          0.8569,
+          0.2967
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa3.jpg",
@@ -131,7 +176,11 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto3-1A.jpg",
+            "guia":   "assets\\guias\\ecuacionesLineales\\montante.jpg",
+            "final":  "assets\\historia\\acto3-1B.jpg",
+            "imagen": "assets\\imagenes\\acto3-1.jpg"
           },
           {
             "nombre": "Gauss-Jordan",
@@ -139,7 +188,11 @@
               0.4,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto3-2A.jpg",
+            "guia":   "assets\\guias\\ecuacionesLineales\\gaussJordan.jpg",
+            "final":  "assets\\historia\\acto3-2B.jpg",
+            "imagen": "assets\\imagenes\\acto3-2.jpg"
           },
           {
             "nombre": "Eliminacion Gaussiana",
@@ -147,7 +200,11 @@
               0.6,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto3-3A.jpg",
+            "guia":   "assets\\guias\\ecuacionesLineales\\eliminacionGaussiana.jpg",
+            "final":  "assets\\historia\\acto3-3B.jpg",
+            "imagen": "assets\\imagenes\\acto3-3.jpg"
           },
           {
             "nombre": "Gauss-Seidel",
@@ -155,7 +212,11 @@
               0.8,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto3-4A.jpg",
+            "guia":   "assets\\guias\\ecuacionesLineales\\gaussSeidel.jpg",
+            "final":  "assets\\historia\\acto3-4B.jpg",
+            "imagen": "assets\\imagenes\\acto3-4.jpg"
           },
           {
             "nombre": "Jacobi",
@@ -163,15 +224,19 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto3-5A.jpg",
+            "guia":   "assets\\guias\\ecuacionesLineales\\jacobi.jpg",
+            "final":  "assets\\historia\\acto3-5B.jpg",
+            "imagen": "assets\\imagenes\\acto3-5.jpg"
           }
         ]
       },
       {
         "nombre": "Minimos Cuadrados",
         "posicion": [
-          0.8488,
-          0.7
+          0.8506,
+          0.6989
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa4.jpg",
@@ -183,7 +248,11 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto4-1A.jpg",
+            "guia":   "assets\\guias\\minimosCuadrados\\lineaRecta.jpg",
+            "final":  "assets\\historia\\acto4-1B.jpg",
+            "imagen": "assets\\imagenes\\acto4-1.jpg"
           },
           {
             "nombre": "Cuadratica",
@@ -191,7 +260,11 @@
               0.4,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto4-2A.jpg",
+            "guia":   "assets\\guias\\minimosCuadrados\\cuadratica.jpg",
+            "final":  "assets\\historia\\acto4-2B.jpg",
+            "imagen": "assets\\imagenes\\acto4-2.jpg"
           },
           {
             "nombre": "Cubica",
@@ -199,7 +272,11 @@
               0.6,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto4-3A.jpg",
+            "guia":   "assets\\guias\\minimosCuadrados\\cubica.jpg",
+            "final":  "assets\\historia\\acto4-3B.jpg",
+            "imagen": "assets\\imagenes\\acto4-3.jpg"
           },
           {
             "nombre": "Lineal con Funcion",
@@ -207,7 +284,11 @@
               0.8,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto4-4A.jpg",
+            "guia":   "assets\\guias\\minimosCuadrados\\linealFuncion.jpg",
+            "final":  "assets\\historia\\acto4-4B.jpg",
+            "imagen": "assets\\imagenes\\acto4-4.jpg"
           },
           {
             "nombre": "Cuadratica con Funcion",
@@ -215,15 +296,19 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto4-5A.jpg",
+            "guia":   "assets\\guias\\minimosCuadrados\\cuadraticaFuncion.jpg",
+            "final":  "assets\\historia\\acto4-5B.jpg",
+            "imagen": "assets\\imagenes\\acto4-5.jpg"
           }
         ]
       },
       {
         "nombre": "Integracion Numerica",
         "posicion": [
-          0.5475,
-          0.8244
+          0.5425,
+          0.8278
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa5.jpg",
@@ -235,7 +320,11 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto5-1A.jpg",
+            "guia":   "assets\\guias\\integracionNumerica\\reglaTrapezoidal.jpg",
+            "final":  "assets\\historia\\acto5-1B.jpg",
+            "imagen": "assets\\imagenes\\acto5-1.jpg"
           },
           {
             "nombre": "Regla 1/3 de Simpson",
@@ -243,7 +332,11 @@
               0.4,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto5-2A.jpg",
+            "guia":   "assets\\guias\\integracionNumerica\\regla1_3Simpson.jpg",
+            "final":  "assets\\historia\\acto5-2B.jpg",
+            "imagen": "assets\\imagenes\\acto5-2.jpg"
           },
           {
             "nombre": "Regla 3/8 de Simpson",
@@ -251,7 +344,11 @@
               0.6,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto5-3A.jpg",
+            "guia":   "assets\\guias\\integracionNumerica\\regla3_8Simpson.jpg",
+            "final":  "assets\\historia\\acto5-3B.jpg",
+            "imagen": "assets\\imagenes\\acto5-3.jpg"
           },
           {
             "nombre": "Newton-Cotes Cerradas",
@@ -259,7 +356,11 @@
               0.8,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto5-4A.jpg",
+            "guia":   "assets\\guias\\integracionNumerica\\newtonCotesCerradas.jpg",
+            "final":  "assets\\historia\\acto5-4B.jpg",
+            "imagen": "assets\\imagenes\\acto5-4.jpg"
           },
           {
             "nombre": "Newton-Cotes Abiertas",
@@ -267,7 +368,11 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto5-5A.jpg",
+            "guia":   "assets\\guias\\integracionNumerica\\newtonCotesAbiertas.jpg",
+            "final":  "assets\\historia\\acto5-5B.jpg",
+            "imagen": "assets\\imagenes\\acto5-5.jpg"
           }
         ]
       },
@@ -275,7 +380,7 @@
         "nombre": "Ecuaciones Diferenciales Ordinarias",
         "posicion": [
           0.2037,
-          0.7322
+          0.7367
         ],
         "estado": "disponible",
         "fondo": "assets\\fondos\\subMapa6.jpg",
@@ -287,15 +392,11 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
-          },
-          {
-            "nombre": "Euler Hacia Atras",
-            "posicion": [
-              0.2,
-              0.3
-            ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-1A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\eulerModificado.jpg",
+            "final":  "assets\\historia\\acto6-1B.jpg",
+            "imagen": "assets\\imagenes\\acto6-1.jpg"
           },
           {
             "nombre": "Euler Hacia Adelante",
@@ -303,7 +404,23 @@
               0.2,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-2A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\eulerHaciaAdelante.jpg",
+            "final":  "assets\\historia\\acto6-2B.jpg",
+            "imagen": "assets\\imagenes\\acto6-2.jpg"
+          },
+          {
+            "nombre": "Euler Hacia Atras",
+            "posicion": [
+              0.2,
+              0.3
+            ],
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-3A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\eulerHaciaAtras.jpg",
+            "final":  "assets\\historia\\acto6-3B.jpg",
+            "imagen": "assets\\imagenes\\acto6-3.jpg"
           },
           {
             "nombre": "Runge-Kutta 2°Orden",
@@ -311,7 +428,11 @@
               0.4,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-4A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\rungeKutta2Orden.jpg",
+            "final":  "assets\\historia\\acto6-4B.jpg",
+            "imagen": "assets\\imagenes\\acto6-4.jpg"
           },
           {
             "nombre": "Runge-Kutta 3°Orden",
@@ -319,7 +440,11 @@
               0.6,
               0.3
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-5A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\rungeKutta3Orden.jpg",
+            "final":  "assets\\historia\\acto6-5B.jpg",
+            "imagen": "assets\\imagenes\\acto6-5.jpg"
           },
           {
             "nombre": "Runge-Kutta 4°Orden por 1/3 de Simpson",
@@ -327,7 +452,11 @@
               0.8,
               0.65
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-6A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\rungeKutta4Orden1_3Simpson.jpg",
+            "final":  "assets\\historia\\acto6-6B.jpg",
+            "imagen": "assets\\imagenes\\acto6-6.jpg"
           },
           {
             "nombre": "Runge-Kutta 4°Orden por 3/8 de Simpson",
@@ -335,7 +464,11 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-7A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\rungeKutta4Orden3_8Simpson.jpg",
+            "final":  "assets\\historia\\acto6-7B.jpg",
+            "imagen": "assets\\imagenes\\acto6-7.jpg"
           },
           {
             "nombre": "Runge-Kutta Orden Superior",
@@ -343,7 +476,11 @@
               0.5,
               0.85
             ],
-            "estado": "disponible"
+            "estado": "disponible",
+            "inicio": "assets\\historia\\acto6-8A.jpg",
+            "guia":   "assets\\guias\\ecuacionesDiferencialesOrdinarias\\rungeKuttaOrdenSuperior.jpg",
+            "final":  "assets\\historia\\acto6-8B.jpg",
+            "imagen": "assets\\imagenes\\acto6-8.jpg"
           }
         ]
       }

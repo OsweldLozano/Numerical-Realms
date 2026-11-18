@@ -3,36 +3,44 @@
   "generador": "interpolacion_lineal",
   "tiempo": 600,
   "decimales": 4,
-  "instruccion": "Calcule g({x}) usando interpolación lineal con los puntos ({x0}, {y0}) y ({x1}, {y1}).",
+  "instruccion": "Calcule g({x}) usando interpolación lineal con los valores de a = {a} y b = {b}",
   "intro": [
-    "g(x) = y0 + (y1 - y0) / (x1 - x0) · (x - x0)",
-    "Datos:  x0={x0}  y0={y0}  x1={x1}  y1={y1}  x={x}"
+    "g(x) = ((f(b) - f(a)) / (b - a)) * (x - a) + f(a)",
+    "error = |f(x) - g(x)|",
+    "Datos:  {funcion}",
+    "x = {x}",
+    "f(x) = {f_x}",
+    "a = {a}",
+    "f(a) = {f_a}",
+    "b = {b}",
+    "f(b) = {f_b}"
   ],
   "pasos": [
     {
       "titulo": "Paso {paso}. Sustituya los valores en la fórmula:",
       "filas": [
-        ["g(x) =", {"in": "y0"}, "+"],
-        ["(", {"in": "y1"}, "-", {"in": "y0"}, ")", "/", "(", {"in": "x1"}, "-", {"in": "x0"}, ")", "·", "(", {"in": "x"}, "-", {"in": "x0"}, ")"]
+        ["g(x) = ((", {"in": "f_b"}, " - ", {"in": "f_a"}, ") /"],
+        ["(", {"in": "b"}, " - ", {"in": "a"}, ")) * "],
+        ["(", {"in": "x"}, " - ", {"in": "a"}, ") + ", {"in": "f_a"}]
       ]
     },
     {
-      "titulo": "Paso {paso}. Resuelva las restas:",
+      "titulo": "Paso {paso}. Resuelve g(x):",
       "filas": [
-        ["g(x) =", {"in": "y0"}, "+", {"in": "dy"}, "/", {"in": "dx"}, "·", {"in": "dx_punto"}]
+        ["g(x) = (", {"in": "(f_b - f_a) / (b - a)", "tol": 0.001}, ") * (", {"in": "x - a"}, ") + ", {"in": "f_a"}],
+        ["g(x) = ", {"in": "g_x", "tol": 0.001}]
       ]
     },
     {
-      "titulo": "Paso {paso}. Calcule la pendiente y el producto (puede escribir fracciones como 7/3):",
+      "titulo": "Paso {paso}. Sustituye los valores de la fórmula:",
       "filas": [
-        ["m = {dy} / {dx} =", {"in": "m", "decimales": 4}],
-        ["m · (x - x0) = m · {dx_punto} =", {"in": "producto", "decimales": 4, "tol": 0.001}]
+        ["error = |", {"in": "f_x", "decimales": 4}, " - ", {"in": "g_x", "decimales": 4, "tol": 0.001}, "|"]
       ]
     },
     {
-      "titulo": "Paso {paso}. Resultado final:",
+      "titulo": "Paso {paso}. Resuelve el error:",
       "filas": [
-        ["g({x}) = {y0} + m · {dx_punto} =", {"in": "resultado", "decimales": 4, "tol": 0.001}]
+        ["error = ", {"in": "error", "decimales": 4, "tol": 0.001}]
       ]
     }
   ]

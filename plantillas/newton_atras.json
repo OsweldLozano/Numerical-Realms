@@ -1,0 +1,53 @@
+{
+  "titulo": "Newton Hacia Atrás",
+  "generador": "newton_atras",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Calcule g({x}) con el método de Newton hacia atrás usando la tabla de {n} puntos.",
+  "intro": [
+    "g(x) = yn + s·Δyn-1 + s(s + 1)/2!·Δ²yn-2 + s(s + 1)(s + 2)/3!·Δ³yn-3 + ...   (n = último punto)",
+    "s = (x - xn) / h   (s sale negativo)",
+    "Datos:  x = {x}",
+    {"repetir": "tabla", "como": "p", "texto": "x{idx} = {p[0]}        y{idx} = {p[1]}"}
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Verifique que los puntos estén igualmente espaciados:",
+      "filas": [
+        {"repetir": "h", "como": "hh", "fila": ["h{num} = {hh.x1} - {par(hh.x0)} =", {"in": "hh.hi"}]},
+        ["Entonces h =", {"in": "s.h"}]
+      ]
+    },
+    {
+      "repetir": "ordenes", "como": "o",
+      "paso": {
+        "titulo": "Paso {paso}. Diferencias de orden {o.k} ({o.simbolo}):",
+        "filas": [
+          {"repetir": "o.valores", "como": "d", "fila": ["{d.etiqueta} = {d.y1} - {par(d.y0)} =", {"in": "d.valor"}]}
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Calcule s:",
+      "filas": [
+        ["s = ({s.x} - {par(s.xi)}) / {s.h} =", {"in": "s.s"}]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Calcule cada término (coeficiente · factor):",
+      "filas": [
+        {"repetir": "g_x.operacion", "como": "op", "fila": [
+          "{op.simbolo} · {op.formula}:   coef. =", {"in": "op.coeficiente"},
+          " factor =", {"in": "op.factor"},
+          " término =", {"in": "op.valor", "tol": 0.005}
+        ]}
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Sume los términos:",
+      "filas": [
+        ["g({x}) =", {"in": "g_x.valor", "tol": 0.01}]
+      ]
+    }
+  ]
+}

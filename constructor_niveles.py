@@ -28,8 +28,11 @@ FORMATO DE LA PLANTILLA
   "generador":   "biseccion",               # obligatorio: nombre registrado en generadores/
   "parametros":  {"iteraciones": 4},        # opcional: se pasan al generador
   "tiempo":      600,                       # opcional, segundos (def. 600)
-  "decimales":   4,                         # opcional: cifras con que se MUESTRAN los números (def. 4)
-  "tolerancia":  1e-6,                      # opcional: tolerancia por defecto de las casillas
+  "decimales":   4,                         # opcional: cifras con que se muestran y se califican
+                                            #   los números (def. 4)
+  "tolerancia":  1e-6,                      # opcional: tolerancia fija para TODAS las casillas
+                                            #   (si falta, cada casilla acepta lo que redondea igual
+                                            #   a "decimales": 1.0986 vale para 1.098612...)
   "instruccion": "Aproxime la raíz de {funcion} en [{a}, {b}]...",
   "intro":       ["{funcion}", ...],        # opcional
   "pasos": [ ...pasos... ]
@@ -49,7 +52,10 @@ Tokens de una fila:
     5                                 etiqueta fija
     {"in": "m"}                       casilla; la respuesta es la expresión "m" evaluada.
                                       Opcional: "decimales" (redondea la respuesta y acepta
-                                      cualquier valor que redondee igual), "tol", "ancho", "limite".
+                                      cualquier valor que redondee igual; si falta se usan los
+                                      "decimales" de la plantilla), "tol" (margen de error; úsalo
+                                      en resultados que el jugador calcula con valores ya
+                                      redondeados), "ancho", "limite".
                                       Si no indicas "ancho", se ajusta a la longitud del número.
     {"in": 7}                         casilla con respuesta fija (no depende de los datos)
     {"matriz": "Ab", "casillas": "todas"}
@@ -79,6 +85,8 @@ CONDICIONES:  cualquier paso, fila, texto o "repetir" puede llevar "si": "expres
 EXPRESIONES: números, + - * / // % **, comparaciones, and/or/not, "x if c else y",
     acceso a datos (it.c o it["c"], A[0][1]) y las funciones abs, round, min, max, len,
     sum, sqrt, exp, log, sin, cos, tan (y las constantes pi, e). Nada más se ejecuta.
+    par(v) escribe el número entre paréntesis si es negativo, para restas legibles:
+    "{a} - {par(b)}" da "5 - (-3)" o "5 - 3".
 
 
 USO DESDE LA TERMINAL
@@ -116,7 +124,6 @@ from nivel_generico import validar_nivel
 BASE = os.path.dirname(os.path.abspath(__file__))
 CARPETA_PLANTILLAS = os.path.join(BASE, "plantillas")
 DECIMALES_DEFECTO = 4
-TOLERANCIA_DEFECTO = 1e-6
 PRUEBAS_AL_CARGAR = 5           # problemas que se generan al iniciar para detectar errores
 
 
@@ -165,6 +172,15 @@ FUNCIONES = {"abs": abs, "round": round, "min": min, "max": max, "len": len, "su
              "sqrt": math.sqrt, "exp": math.exp, "log": math.log,
              "sin": math.sin, "cos": math.cos, "tan": math.tan}
 CONSTANTES = {"pi": math.pi, "e": math.e, "True": True, "False": False}
+_DECIMALES_ACTUALES = [DECIMALES_DEFECTO]       # los de la plantilla que se está construyendo
+
+
+def _par(v):
+    t = formatear(v, _DECIMALES_ACTUALES[0])
+    return f"({t})" if t.startswith("-") else t
+
+
+FUNCIONES["par"] = _par
 _cache_ast = {}
 
 
@@ -299,6 +315,8 @@ def _casilla(valor, opciones, ruta, conf):
         if isinstance(valor, float) and (math.isnan(valor) or math.isinf(valor)):
             _err(ruta, f"la respuesta de la casilla no es un número válido ({valor})")
         dec = opciones.get("decimales")
+        if dec is None and conf["tolerancia"] is None:
+            dec = conf["decimales"]
         if dec is not None:
             valor = round(valor, dec)
             tol = opciones.get("tol", 0.5 * 10 ** -dec + 1e-12)
@@ -409,7 +427,8 @@ def construir_nivel(plantilla, datos, ruta="plantilla"):
     if not isinstance(datos, dict):
         _err(ruta, f"el generador debe devolver un diccionario (devolvió {type(datos).__name__})")
     conf = {"decimales": int(plantilla.get("decimales", DECIMALES_DEFECTO)),
-            "tolerancia": float(plantilla.get("tolerancia", TOLERANCIA_DEFECTO))}
+            "tolerancia": (float(plantilla["tolerancia"]) if "tolerancia" in plantilla else None)}
+    _DECIMALES_ACTUALES[0] = conf["decimales"]
     ctx = normalizar_datos(datos)
 
     nivel = {

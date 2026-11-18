@@ -1,0 +1,33 @@
+{
+  "titulo": "Lagrange",
+  "generador": "lagrange",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Calcule g({x}) con el polinomio de Lagrange usando la tabla de {n} puntos.",
+  "intro": [
+    "g(x) = y0·L0(x) + y1·L1(x) + ...",
+    "Li(x) = producto de (x - xj) / producto de (xi - xj), con j ≠ i",
+    "Datos:  x = {x}",
+    {"repetir": "tabla", "como": "p", "texto": "x{idx} = {p[0]}        y{idx} = {p[1]}"}
+  ],
+  "pasos": [
+    {
+      "repetir": "pasos", "como": "t",
+      "paso": {
+        "titulo": "Paso {paso}. Término de x{idx} = {t.abajo.x}:",
+        "filas": [
+          ["Numerador: {t.texto_arriba} =", {"in": "t.numerador"}],
+          ["Denominador: {t.texto_abajo} =", {"in": "t.denominador"}],
+          ["L{idx} = numerador / denominador =", {"in": "t.L"}],
+          ["y{idx} · L{idx} = {t.y} · L{idx} =", {"in": "t.valor", "tol": 0.005}]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Sume los términos:",
+      "filas": [
+        ["g({x}) =", {"in": "g_x", "tol": 0.01}]
+      ]
+    }
+  ]
+}

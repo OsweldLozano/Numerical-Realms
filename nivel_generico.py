@@ -34,6 +34,15 @@ Token de una fila:
                                el juego lo escala solo a la resolución actual.
     {"matriz": [[...],...]} -> matriz; cada celda es texto/número fijo o {"in": ...}
 También se acepta un solo nivel (objeto) o una lista de niveles sin la clave "niveles".
+
+Se pierde el nivel al agotarse el tiempo o al cometer MAX_ERRORES errores (3). Cuenta como
+error cada vez que se presiona "Comprobar" con alguna respuesta incorrecta; si hay casillas
+vacías solo se marcan y no cuenta.
+
+Teclas durante el nivel:
+    G     vuelve a mostrar la guía del nivel (el tiempo se detiene mientras se ve)
+    Esc   sale del nivel
+    F11   pantalla completa <-> ventana
 """
 import io
 import json
@@ -45,11 +54,14 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton, UILabel, UITextEntryLine, UIScrollingContainer
 
+import pantalla_imagen
 import ventana
 from ventana import ANCHO, ALTO
 
 # ----------------------------------------------------------------- constantes
 TIEMPO_DEFECTO = 10 * 60
+MAX_ERRORES = 3                  # al llegar a este número de errores se pierde el nivel
+ESPERA_AL_COMPLETAR = 1.5        # segundos que se ve "¡Nivel completado!" antes de salir (modo mapa)
 
 GRIS = (200, 200, 200)
 OSCURO = (43, 43, 43)
@@ -298,16 +310,17 @@ class Juego:
 
     Modo independiente (modo_mapa=False): recorre todos los niveles con "Siguiente nivel".
     Modo mapa (modo_mapa=True): se juega un solo nivel y `ejecutar()` devuelve
-        "completado" | "volver" | "salir"  (ver numerical_realms.py).
+        "completado" | "volver" | "salir"  (ver numerical_realms.py). Al completarlo sale solo
+        tras ESPERA_AL_COMPLETAR segundos; si se acaba el tiempo, "Reintentar" devuelve "volver"
+        (el jugador regresa al submapa).
     """
 
-    def __init__(self, niveles, modo_mapa=False, sonido=True, pantalla=None, regenerar=None):
-        """regenerar: función opcional sin argumentos que devuelve un nivel nuevo (un problema
-        distinto). Si se da, "Reintentar" usa un problema nuevo en lugar de repetir el mismo."""
+    def __init__(self, niveles, modo_mapa=False, sonido=True, pantalla=None, guia=None):
+        """guia: ruta de la imagen de la guía, que se vuelve a mostrar con la tecla G."""
         self.modo_mapa = modo_mapa
-        self.regenerar = regenerar
         self.niveles = niveles
         self.pantalla = pantalla or ventana.obtener_pantalla()
+        self.guia = guia if pantalla_imagen.cargar(guia) is not None else None
         self.reloj = pygame.time.Clock()
         self.manager = pygame_gui.UIManager((ANCHO, ALTO), theme_path=io.StringIO(json.dumps(THEME)))
         self.fuentes = {}
@@ -339,10 +352,11 @@ class Juego:
         self.pasos_pendientes = [Paso(p) for p in datos["pasos"]]
         self.pasos = []
         self.errores = 0
-        self.estado = ""            # "", "ok", "tiempo"
+        self.estado = ""            # "", "ok", "tiempo", "errores"
         self.btn_sig = None
         self.btn_volver = None
         self.btn_reintentar = None
+        self.espera_salida = None   # cuenta regresiva para salir solo al completar (modo mapa)
         self.pendiente_scroll = 0.0
 
         y = 8
@@ -471,8 +485,9 @@ class Juego:
     def agregar_final(self):
         y = self.cursor_y
         if self.modo_mapa:
-            self.btn_volver = UIButton(pygame.Rect(0, y, 240, 46), "Volver al mapa",
-                                       self.manager, container=self.scroll)
+            # sin botón: tras unos segundos se pasa solo a las pantallas del final
+            self.etiqueta(pygame.Rect(0, y, AREA_W, 38), "¡Nivel completado!")
+            self.espera_salida = ESPERA_AL_COMPLETAR
         elif self.idx + 1 < len(self.niveles):
             self.btn_sig = UIButton(pygame.Rect(0, y, 240, 46), "Siguiente nivel >>",
                                     self.manager, container=self.scroll)
@@ -482,14 +497,13 @@ class Juego:
         self.scroll.set_scrollable_area_dimensions((AREA_W, self.cursor_y))
         self.pendiente_scroll = 1.0
 
-    def agregar_botones_tiempo(self):
-        """Al agotarse el tiempo (modo mapa): ofrece reintentar o volver."""
+    def agregar_botones_tiempo(self, mensaje="Se acabó el tiempo. ¿Lo intentas de nuevo?"):
+        """Al perder el nivel (tiempo agotado o demasiados errores): "Reintentar" regresa al
+        submapa en modo mapa, o reinicia el nivel si se juega solo."""
         y = self.cursor_y
-        self.etiqueta(pygame.Rect(0, y, AREA_W, 36), "Se acabó el tiempo. ¿Lo intentas de nuevo?")
+        self.etiqueta(pygame.Rect(0, y, AREA_W, 36), mensaje)
         self.btn_reintentar = UIButton(pygame.Rect(0, y + 44, 190, 46), "Reintentar",
                                        self.manager, container=self.scroll)
-        self.btn_volver = UIButton(pygame.Rect(204, y + 44, 240, 46), "Volver al mapa",
-                                   self.manager, container=self.scroll)
         self.cursor_y = y + 106
         self.scroll.set_scrollable_area_dimensions((AREA_W, self.cursor_y))
         self.pendiente_scroll = 1.0
@@ -508,8 +522,10 @@ class Juego:
     def comprobar(self, paso):
         if paso.resuelto or self.estado:
             return
-        todo_bien = True
+        todo_bien, hay_vacias = True, False
         for e, resp, tol in paso.entradas:
+            vacia = not e.get_text().strip()
+            hay_vacias |= vacia
             ok = es_correcto(e.get_text(), resp, tol)
             todo_bien &= ok
             try:
@@ -517,7 +533,14 @@ class Juego:
             except Exception:
                 pass
         if not todo_bien:
+            if hay_vacias:
+                return              # con casillas vacías solo se marcan; no cuenta como error
             self.errores += 1
+            if self.errores >= MAX_ERRORES:
+                self.estado = "errores"
+                self.bloquear_todo()
+                self.agregar_botones_tiempo(
+                    f"Cometiste {MAX_ERRORES} errores. ¿Lo intentas de nuevo?")
             return
         paso.resuelto = True
         for e, _, _ in paso.entradas:
@@ -554,6 +577,9 @@ class Juego:
         s.blit(img, img.get_rect(center=PILDORA.center))
         self.dibujar_icono_config()
         self.dibujar_icono_sonido()
+        if self.guia:
+            img = self.fuente(24).render("G: ver guía", True, OSCURO)
+            s.blit(img, img.get_rect(midleft=(self.rect_config.right + 18, BARRA.centery)))
 
         # columna izquierda: tiempo, instrucción y errores
         pygame.draw.rect(s, GRIS, COLUMNA)
@@ -578,9 +604,13 @@ class Juego:
             self.centrado(30, "¡Nivel completado!", AMARILLO, (cx, CAJA_INSTR.bottom - 36))
         elif self.estado == "tiempo":
             self.centrado(30, "¡Tiempo agotado!", ROJO, (cx, CAJA_INSTR.bottom - 36))
+        elif self.estado == "errores":
+            self.centrado(30, "¡Demasiados errores!", ROJO, (cx, CAJA_INSTR.bottom - 36))
 
-        pygame.draw.rect(s, VERDE, CAJA_ERRORES)
-        self.centrado(34, f"Errores: {self.errores}", BLANCO, CAJA_ERRORES.center)
+        # la caja se pone roja cuando solo queda un error disponible
+        fondo_e = (185, 45, 45) if self.errores >= MAX_ERRORES - 1 else VERDE
+        pygame.draw.rect(s, fondo_e, CAJA_ERRORES)
+        self.centrado(34, f"Errores: {self.errores} / {MAX_ERRORES}", BLANCO, CAJA_ERRORES.center)
 
         # panel derecho con el pergamino
         pygame.draw.rect(s, GRIS, PANEL)
@@ -623,6 +653,13 @@ class Juego:
             return None
         if ev.type == pygame.KEYDOWN and ev.key == pygame.K_ESCAPE:
             return self.resultado_salida()
+        if ev.type == pygame.KEYDOWN and ev.key == pygame.K_g and self.guia:
+            # no se pasa a pygame-gui: la "g" no se escribe en la casilla activa
+            if pantalla_imagen.mostrar(self.pantalla, self.guia) == "salir":
+                self.corriendo = False
+                return "salir"
+            self.reloj.tick()                   # el tiempo no corre mientras se ve la guía
+            return None
         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
             if self.rect_sonido.collidepoint(ev.pos):
                 self.sonido = not self.sonido
@@ -633,11 +670,8 @@ class Juego:
             if self.btn_volver is not None and ev.ui_element is self.btn_volver:
                 return self.resultado_salida()
             if self.btn_reintentar is not None and ev.ui_element is self.btn_reintentar:
-                if self.regenerar is not None:
-                    try:
-                        self.niveles[self.idx] = self.regenerar()
-                    except Exception as e:      # si falla, se repite el mismo problema
-                        print(f"No pude generar un problema nuevo: {e}")
+                if self.modo_mapa:
+                    return "volver"             # de vuelta al submapa
                 self.cargar_nivel(self.idx)
                 return None
             if self.btn_sig is not None and ev.ui_element is self.btn_sig:
@@ -660,8 +694,7 @@ class Juego:
                 self.tiempo = 0
                 self.estado = "tiempo"
                 self.bloquear_todo()
-                if self.modo_mapa:
-                    self.agregar_botones_tiempo()
+                self.agregar_botones_tiempo()
         self.manager.update(dt)
         if self.pendiente_scroll is not None:
             barra = getattr(self.scroll, "vert_scroll_bar", None)
@@ -687,6 +720,10 @@ class Juego:
                 if r:
                     return r
             self.cuadro(dt)
+            if self.espera_salida is not None:
+                self.espera_salida -= dt
+                if self.espera_salida <= 0:
+                    return "completado"
 
     def run(self):
         """Modo independiente: corre hasta cerrar la ventana (o Esc) y sale de pygame."""
