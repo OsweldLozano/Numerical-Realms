@@ -1,0 +1,62 @@
+{
+  "titulo": "Montante",
+  "nivel": "Montante",
+  "generador": "montante",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Resuelva el sistema con el método de Montante (Bareiss).",
+  "intro": [
+    "Sistema:",
+    {
+      "repetir": "ecuaciones",
+      "como": "ec",
+      "texto": "    {ec}"
+    },
+    "a'ij = (pivote · aij - aik · akj) / pivote anterior   (el primer pivote anterior es 1)",
+    "El renglón del pivote no cambia y el resto de su columna se hace 0.",
+    "Al final: xi = bi / determinante (el último pivote)."
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Escriba la matriz aumentada [A | b]:",
+      "filas": [
+        [
+          {
+            "matriz": "Ab",
+            "casillas": "todas"
+          }
+        ]
+      ]
+    },
+    {
+      "repetir": "etapas",
+      "como": "et",
+      "paso": {
+        "titulo": "Paso {paso}. Pivote {et.pivote} (pivote anterior {et.pivote_anterior}):",
+        "filas": [
+          [
+            {
+              "matriz": "et.matriz",
+              "casillas": "et.editables"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Divida entre el determinante ({determinante}):",
+      "filas": [
+        {
+          "repetir": "solucion",
+          "como": "s",
+          "fila": [
+            "{s.variable} = {s.b} / {par(determinante)} =",
+            {
+              "in": "s.valor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

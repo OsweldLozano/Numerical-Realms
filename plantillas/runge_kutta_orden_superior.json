@@ -1,0 +1,69 @@
+{
+  "titulo": "Runge-Kutta Orden Superior",
+  "nivel": "Runge-Kutta Orden Superior",
+  "generador": "runge_kutta_orden_superior",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime y({t_final}) e y'({t_final}) con Runge-Kutta para orden superior en {n} iteraciones.",
+  "intro": [
+    "{funcion}",
+    "k1 = h·y'(i)        m1 = h·f(y'(i), y(i), t(i))",
+    "k2 = h·(y'(i) + m1)        m2 = h·f(y'(i) + m1, y(i) + k1, t(i) + h)",
+    "y(i+1) = y(i) + (k1 + k2) / 2        y'(i+1) = y'(i) + (m1 + m2) / 2",
+    "Escriba los resultados con 4 decimales.",
+    "Datos:  h = {h}     t0 = {t0}     y({t0}) = {y0}     y'({t0}) = {yp0}"
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: t{idx} = {it.m1.qn},  y{idx} = {it.m1.Un},  y'{idx} = {it.m1.Vn}",
+        "filas": [
+          [
+            "k1 = h·y'{idx} = {h}·{par(it.k1.Vn)} =",
+            {
+              "in": "it.k1.k1",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "m1 = {it.texto_m1} =",
+            {
+              "in": "it.m1.m1",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "k2 = h·(y'{idx} + m1) = {h}·({it.k2.Vn}) =",
+            {
+              "in": "it.k2.k2",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "m2 = {it.texto_m2} =",
+            {
+              "in": "it.m2.m2",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "y{num} = y{idx} + (k1 + k2) / 2 =",
+            {
+              "in": "it.yi.yi",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "y'{num} = y'{idx} + (m1 + m2) / 2 =",
+            {
+              "in": "it.ypi.ypi",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

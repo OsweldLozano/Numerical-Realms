@@ -1,0 +1,65 @@
+{
+  "titulo": "Secante",
+  "nivel": "Secante",
+  "generador": "secante",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Aproxime la raíz de {funcion} con el método de la secante partiendo de x0 = 0 y x1 = 1.",
+  "intro": [
+    "{funcion}",
+    "x(i+1) = x(i) - f(x(i))·(x(i) - x(i-1)) / (f(x(i)) - f(x(i-1)))",
+    "error = |x(i+1) - x(i)|; se detiene cuando error <= 0.001.",
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Calcule x{it.i}:  x{it.i - 2} = {it.xa},  x{it.i - 1} = {it.xb}",
+        "filas": [
+          [
+            "f(x{it.i - 2}) = {it.texto_fa} =",
+            {
+              "in": "it.fa",
+              "tol": "it.tol_fa"
+            }
+          ],
+          [
+            "f(x{it.i - 1}) = {it.texto_fb} =",
+            {
+              "in": "it.fb",
+              "tol": "it.tol_fb"
+            }
+          ],
+          [
+            "x{it.i} = x{it.i - 1} - f(x{it.i - 1})·(x{it.i - 1} - x{it.i - 2}) / (f(x{it.i - 1}) - f(x{it.i - 2})) =",
+            {
+              "in": "it.x",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "error = |x{it.i} - x{it.i - 1}| =",
+            {
+              "in": "it.error",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Resultado:",
+      "filas": [
+        [
+          "Raíz aproximada: x =",
+          {
+            "in": "raiz",
+            "tol": 0.0005
+          }
+        ]
+      ]
+    }
+  ]
+}

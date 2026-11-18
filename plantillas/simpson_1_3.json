@@ -1,0 +1,86 @@
+{
+  "titulo": "Regla 1/3 de Simpson",
+  "generador": "simpson_1_3",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime la integral de {funcion} de {a} a {b} con la regla 1/3 de Simpson usando n = {n} subintervalos.",
+  "intro": [
+    "I = (h/3)·[f(x0) + 4·(impares) + 2·(pares) + f(xn)]",
+    "h = (b - a) / n   (n debe ser par)",
+    "Datos:  {funcion}",
+    "a = {a}     b = {b}     n = {n}"
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Calcule el ancho de cada subintervalo:",
+      "filas": [
+        [
+          "h = ({b} - {par(a)}) / {n} =",
+          {
+            "in": "h"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Evalúe la función en cada punto (4 decimales):",
+      "filas": [
+        {
+          "repetir": "puntos",
+          "como": "p",
+          "fila": [
+            "x{p.i} = {p.x}     f(x{p.i}) = {p.texto} =",
+            {
+              "in": "p.valor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Agrupe los valores:",
+      "filas": [
+        [
+          "Extremos: f(x0) + f(x{n}) =",
+          {
+            "in": "extremos",
+            "tol": "tol_extremos"
+          }
+        ],
+        [
+          "Impares: f(x1) + f(x3) + ... =",
+          {
+            "in": "impares",
+            "tol": "tol_impares"
+          }
+        ],
+        [
+          "Pares: f(x2) + f(x4) + ... =",
+          {
+            "in": "pares",
+            "tol": "tol_pares"
+          }
+        ],
+        [
+          "Suma = extremos + 4 · impares + 2 · pares =",
+          {
+            "in": "suma",
+            "tol": "tol_suma"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Calcule la integral:",
+      "filas": [
+        [
+          "I = (h / 3) · suma = ({h} / 3) · suma =",
+          {
+            "in": "l",
+            "tol": "tol_l"
+          }
+        ]
+      ]
+    }
+  ]
+}

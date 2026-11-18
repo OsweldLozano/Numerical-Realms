@@ -1,0 +1,39 @@
+{
+  "titulo": "Euler Hacia Adelante",
+  "nivel": "Euler Hacia Adelante",
+  "generador": "euler_adelante",
+  "tiempo": 600,
+  "decimales": 4,
+  "instruccion": "Aproxime y({t_final}) con el método de Euler hacia adelante en {n} iteraciones.",
+  "intro": [
+    "{funcion}",
+    "y(i+1) = y(i) + h·f(y(i), t(i))",
+    "Escriba los resultados con 4 decimales.",
+    "Datos:  h = {h}     t0 = {t0}     y0 = y({t0}) = {y0}"
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: t{idx} = {it.t0},  y{idx} = {it.y0}",
+        "filas": [
+          [
+            "f(y{idx}, t{idx}) = {it.texto_f} =",
+            {
+              "in": "it.f",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "y{num} = y{idx} + h·f(y{idx}, t{idx}) =",
+            {
+              "in": "it.yi",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

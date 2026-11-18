@@ -1,0 +1,77 @@
+{
+  "titulo": "Newton-Cotes Abiertas",
+  "generador": "newton_cotes_abiertas",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime la integral de {funcion} de {a} a {b} con la fórmula abierta de Newton-Cotes de n = {n}.",
+  "intro": [
+    "I = h · c · [w1·f(x1) + ... + w{intervalos - 1}·f(x{intervalos - 1})]   (no usa f(a) ni f(b))",
+    "h = (b - a) / (n + 2)",
+    "Coeficientes para n = {n}:  c = {constante}    w = {pesos_texto}",
+    "Datos:  {funcion}",
+    "a = {a}     b = {b}     n = {n}"
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Calcule el ancho de cada subintervalo:",
+      "filas": [
+        [
+          "h = ({b} - {par(a)}) / ({n} + 2) =",
+          {
+            "in": "h"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Evalúe la función en cada punto (4 decimales):",
+      "filas": [
+        {
+          "repetir": "puntos",
+          "como": "p",
+          "fila": [
+            "x{p.i} = {p.x}     f(x{p.i}) = {p.texto} =",
+            {
+              "in": "p.valor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Multiplique cada f(xi) por su coeficiente:",
+      "filas": [
+        {
+          "repetir": "puntos",
+          "como": "p",
+          "fila": [
+            "{p.peso} · f(x{p.i}) =",
+            {
+              "in": "p.producto",
+              "tol": "p.tol"
+            }
+          ]
+        },
+        [
+          "Suma de los productos =",
+          {
+            "in": "suma",
+            "tol": "tol_suma"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Calcule la integral:",
+      "filas": [
+        [
+          "I = h · c · suma = {h} · {constante} · suma =",
+          {
+            "in": "l",
+            "tol": "tol_l"
+          }
+        ]
+      ]
+    }
+  ]
+}

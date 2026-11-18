@@ -2,31 +2,73 @@
   "titulo": "Bisección",
   "nivel": "Bisectriz",
   "generador": "biseccion",
-  "parametros": {"iteraciones": 4},
-  "tiempo": 720,
+  "tiempo": 1200,
   "decimales": 4,
-  "instruccion": "Aproxime la raíz de {funcion} en el intervalo [{a}, {b}] con {len(iteraciones)} iteraciones del método de bisección.",
+  "instruccion": "Aproxime la raíz de {funcion} con el método de bisección a partir del intervalo [{a}, {b}].",
   "intro": [
     "{funcion}",
-    "c = (a + b) / 2.  Si f(a)·f(c) < 0 la raíz está en [a, c]; si no, en [c, b].",
-    "Escriba f(c) con 4 decimales."
+    "c = (a + b) / 2",
+    "Si f(a)·f(c) < 0, la raíz está en [a, c]; si no, en [c, b].",
+    "error = |c(i) - c(i-1)|; se detiene cuando error <= 0.001 (máximo 9 iteraciones).",
+    "Escriba los resultados con 4 decimales."
   ],
   "pasos": [
     {
-      "repetir": "iteraciones", "como": "it",
+      "repetir": "iteraciones",
+      "como": "it",
       "paso": {
-        "titulo": "Paso {paso}. Iteración {num}: intervalo [{it.a}, {it.b}]",
+        "titulo": "Paso {paso}. Iteración {num}: [a, b] = [{it.a}, {it.b}]",
         "filas": [
-          ["c = ({it.a} + {it.b}) / 2 =", {"in": "it.c"}],
-          ["f(c) =", {"in": "it.fc", "decimales": 4}],
-          ["Nuevo intervalo: [", {"in": "it.a_nuevo"}, ",", {"in": "it.b_nuevo"}, "]"]
+          [
+            "c{num} = ({it.a} + {it.b}) / 2 =",
+            {
+              "in": "it.c",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "f(c{num}) = {it.texto_fc} =",
+            {
+              "in": "it.fc",
+              "tol": "it.tol_fc"
+            }
+          ],
+          {
+            "si": "idx > 0",
+            "fila": [
+              "error = |c{num} - c{idx}| =",
+              {
+                "in": "it.error",
+                "tol": 0.0005
+              }
+            ]
+          },
+          [
+            "Nuevo intervalo: [",
+            {
+              "in": "it.a_nuevo",
+              "tol": 0.0005
+            },
+            ",",
+            {
+              "in": "it.b_nuevo",
+              "tol": 0.0005
+            },
+            "]"
+          ]
         ]
       }
     },
     {
       "titulo": "Paso {paso}. Resultado:",
       "filas": [
-        ["Aproximación de la raíz: x ≈", {"in": "raiz"}]
+        [
+          "Raíz aproximada: x =",
+          {
+            "in": "raiz",
+            "tol": 0.0005
+          }
+        ]
       ]
     }
   ]

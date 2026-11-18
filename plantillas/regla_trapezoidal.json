@@ -1,0 +1,79 @@
+{
+  "titulo": "Regla Trapezoidal",
+  "generador": "regla_trapezoidal",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime la integral de {funcion} de {a} a {b} con la regla trapezoidal usando n = {n} subintervalos.",
+  "intro": [
+    "I = (h/2)·[f(x0) + 2·(f(x1) + ... + f(xn-1)) + f(xn)]",
+    "h = (b - a) / n",
+    "Datos:  {funcion}",
+    "a = {a}     b = {b}     n = {n}"
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Calcule el ancho de cada subintervalo:",
+      "filas": [
+        [
+          "h = ({b} - {par(a)}) / {n} =",
+          {
+            "in": "h"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Evalúe la función en cada punto (4 decimales):",
+      "filas": [
+        {
+          "repetir": "puntos",
+          "como": "p",
+          "fila": [
+            "x{p.i} = {p.x}     f(x{p.i}) = {p.texto} =",
+            {
+              "in": "p.valor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Agrupe los valores:",
+      "filas": [
+        [
+          "Extremos: f(x0) + f(x{n}) =",
+          {
+            "in": "extremos",
+            "tol": "tol_extremos"
+          }
+        ],
+        [
+          "Interiores: f(x1) + ... + f(x{n - 1}) =",
+          {
+            "in": "interiores",
+            "tol": "tol_interiores"
+          }
+        ],
+        [
+          "Suma = extremos + 2 · interiores =",
+          {
+            "in": "suma",
+            "tol": "tol_suma"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Calcule la integral:",
+      "filas": [
+        [
+          "I = (h / 2) · suma = ({h} / 2) · suma =",
+          {
+            "in": "l",
+            "tol": "tol_l"
+          }
+        ]
+      ]
+    }
+  ]
+}

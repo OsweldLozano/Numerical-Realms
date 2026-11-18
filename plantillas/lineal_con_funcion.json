@@ -1,0 +1,65 @@
+{
+  "titulo": "Lineal con Función",
+  "nivel": "Lineal con Funcion",
+  "generador": "lineal_con_funcion",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Ajuste el modelo y = a0 + a1·x + a2·f(x) a los datos por mínimos cuadrados.",
+  "intro": [
+    "Modelo: y = a0 + a1·x + a2·f(x)",
+    "{funcion}",
+    "Datos ({n} puntos):",
+    {
+      "repetir": "puntos",
+      "como": "p",
+      "texto": "    x = {p[0]}        y = {p[1]}"
+    },
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Calcule las sumatorias:",
+      "filas": [
+        {
+          "repetir": "sumas",
+          "como": "s",
+          "fila": [
+            "{s.nombre} =",
+            {
+              "in": "s.valor",
+              "tol": "s.tol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Escriba el sistema de ecuaciones normales [A | b]:",
+      "filas": [
+        [
+          {
+            "matriz": "matriz",
+            "casillas": "todas",
+            "tol": "tol_matriz"
+          }
+        ]
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. Resuelva el sistema (use al menos 6 decimales en las operaciones):",
+      "filas": [
+        {
+          "repetir": "coeficientes",
+          "como": "c",
+          "fila": [
+            "{c.nombre} =",
+            {
+              "in": "c.valor",
+              "tol": "c.tol"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

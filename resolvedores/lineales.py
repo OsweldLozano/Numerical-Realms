@@ -1,13 +1,18 @@
+"""
+Resolvedor de los métodos de ecuaciones lineales (código de Vanessa).
+La matriz es la aumentada [A | b], como lista de filas.
+
+Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
+    * GaussSeidel y Jacobi: el criterio de paro nunca detenía el método (el break estaba
+      dentro de un "for i in range(len(x))" y solo salía de ese ciclo), así que siempre se
+      hacían 10 iteraciones. Ahora se detiene cuando el error máximo <= tol.
+    * GaussSeidel y Jacobi: "despejes" siempre salía vacío, porque se reasignaba
+      despejes = [] antes del zip(xs, despejes) que debía llenarlo.
+"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
 import numpy as np
-import os
-import shutil
-from pathlib import Path
-
-#Programas
-import utilidades as util
 
 """  Metodos  """
 def Montante(matriz):
@@ -123,7 +128,8 @@ def GaussJordan(matriz):
 
     datos = {
         "iteraciones":iteraciones.copy(),
-        "matriz":matrizi.copy(),
+        "matriz":matriz,
+        "matriz_final":matriz0.copy(),
         "incognitas":incognitas.copy()
     }
     return datos 
@@ -182,42 +188,35 @@ def EliminacionGaussiana(matriz):
 
     datos = {
         "iteraciones":iteraciones.copy(),
-        "matriz":matriz0.copy(),
+        "matriz":matriz,
+        "matriz_final":matriz0.copy(),
         "incognitas":variables.copy()
         }
     return datos 
     
 def GaussSeidel(matriz):
-    titulo = "GaussSeidel"
-    archivo = open(util.Ruta(titulo), "w")
-    InicioEcuacionLineal(archivo, titulo, matriz)
-
     if(not DiagonalDominante(matriz)):
-        archivo.write("No se puede Realizar \n")
-        archivo.close()
         return
 
     xs, despejes = Despeje(matriz)
     fun = [sp.lambdify(xs, d, 'math') for d in despejes]
 
+    lista_despejes = []                              # CORREGIDO: antes se reasignaba "despejes"
     for variable, expresion in zip(xs, despejes):
-        archivo.write(f"{variable} = {expresion}  \n")
-    archivo.write("\n")
+        despeje ={
+            "expresion": expresion,
+            "variable": variable
+        }
+        lista_despejes.append(despeje.copy())
+    despejes = lista_despejes
 
     n = len(xs)
     x = [0]*n
 
     tol = 0.001
-    max_iter = 100
-        
-    archivo.write("0 ")
-    for i in range(n):
-        archivo.write("\t\t " + str(x[i]))
-    for i in range(n):
-        archivo.write(" \t\t --- ")
-    archivo.write("\n")
+    max_iter = 10
 
-
+    iteraciones = []
     for k in range(1, max_iter + 1):
         x_ant = x.copy()
         for i in range(n):
@@ -225,69 +224,68 @@ def GaussSeidel(matriz):
 
         errores = [abs(nuevo - ant) for nuevo, ant in zip(x, x_ant)]
 
-        valores = "\t\t".join(f"{v:.{15}f}" for v in x)
-        errs = "\t\t".join(f"{e:.{15}f}" for e in errores)
-        archivo.write(f"{k}\t\t{valores}\t\t{errs}\n")
+        iteracion = {
+            "valores": x.copy(),
+            "errores": errores.copy()
+        }
+        iteraciones.append(iteracion.copy())
 
         if(round(max(errores), 3) <= tol):
-            for i in range(len(x)):
-                archivo.write("\n x" + str(i+1) + " = " + str(x[i]) + "\n")
-            archivo.close()
-            return
+            break                                    # CORREGIDO: salía solo de un for interno
 
-    archivo.write("\nMaxima iteración alcanzada")
-    archivo.close()
+    datos = {
+        "iteraciones":iteraciones.copy(),
+        "matriz":matriz,
+        "despejes":despejes.copy(),
+        "incognitas":x.copy()
+    }
+    return datos
 
 def Jacobi(matriz):
-    titulo = "Jacobi"
-    archivo = open(util.Ruta(titulo), "w")
-    InicioEcuacionLineal(archivo, titulo, matriz)
-    
     if(not DiagonalDominante(matriz)):
-        archivo.write("No se puede Realizar \n")
-        archivo.close()
         return
     
     xs, despejes = Despeje(matriz)
     fun = [sp.lambdify(xs, d, 'math') for d in despejes]
 
+    lista_despejes = []                              # CORREGIDO: antes se reasignaba "despejes"
     for variable, expresion in zip(xs, despejes):
-        archivo.write(f"{variable} = {expresion}  \n")
-    archivo.write("\n")
+        despeje ={
+            "expresion": expresion,
+            "variable": variable
+        }
+        lista_despejes.append(despeje.copy())
+    despejes = lista_despejes
     
     n = len(xs)
     x = [1]*n
     
     tol = 0.001
-    max_iter = 100
-            
-    archivo.write("0 ")
-    for i in range(n):
-        archivo.write("\t\t " + str(x[i]))
-    for i in range(n):
-        archivo.write(" \t\t --- ")
-    archivo.write("\n")
+    max_iter = 10
     
-    
+    iteraciones = []
     for k in range(1, max_iter + 1):
         x_ant = x
         x = [f(*x_ant) for f in fun]  
 
         errores = [abs(nuevo - ant) for nuevo, ant in zip(x, x_ant)]
-    
-        valores = "\t\t".join(f"{v:.{15}f}" for v in x)
-        errs = "\t\t".join(f"{e:.{15}f}" for e in errores)
-        archivo.write(f"{k}\t\t{valores}\t\t{errs}\n")
+
+        iteracion = {
+            "valores": x.copy(),
+            "errores": errores.copy()
+        }
+        iteraciones.append(iteracion.copy())
     
         if(round(max(errores), 3) <= tol):
-            for i in range(len(x)):
-                archivo.write("\n x" + str(i+1) + " = " + str(x[i]) + "\n")
-            archivo.close()
-            return
-    
-    archivo.write("\nMaxima iteración alcanzada")
-    archivo.close()
+            break                                    # CORREGIDO: salía solo de un for interno
 
+    datos = {
+        "iteraciones":iteraciones.copy(),
+        "matriz":matriz,
+        "despejes":despejes.copy(),
+        "incognitas":x.copy()
+    }
+    return datos
 
 
 """  Complementos  """

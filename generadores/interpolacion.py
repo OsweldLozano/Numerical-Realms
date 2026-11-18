@@ -66,7 +66,7 @@ def _tabla(xs, ys):
 FUNCIONES_LINEAL = [
     # (expresión, texto, mínimo de a, máximo de b)
     (sp.log(X), "ln(x)", 1, 9),
-    (sp.sqrt(X), "√x", 0, 16),
+    (sp.sqrt(X), "raíz(x)", 0, 16),
     (sp.exp(X), "eˣ", 0, 3),
     (1 / X, "1/x", 1, 8),
     (X ** 2, "x²", -4, 6),

@@ -1,0 +1,45 @@
+{
+  "titulo": "Método Gráfico",
+  "nivel": "Grafica",
+  "generador": "grafica",
+  "tiempo": 600,
+  "decimales": 4,
+  "instruccion": "Tabule {funcion} en los enteros y encuentre el intervalo [a, b] donde f cambia de signo.",
+  "intro": [
+    "{funcion}",
+    "Hay una raíz entre a y b si f(a) y f(b) tienen signos distintos.",
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Evalúe f en cada punto:",
+      "filas": [
+        {
+          "repetir": "puntos",
+          "como": "p",
+          "fila": [
+            "f({p.x}) = {p.texto} =",
+            {
+              "in": "p.fx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Paso {paso}. ¿Entre qué enteros cambia de signo f?",
+      "filas": [
+        [
+          "La raíz está entre a =",
+          {
+            "in": "a"
+          },
+          " y b =",
+          {
+            "in": "b"
+          }
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "titulo": "Newton-Raphson",
+  "nivel": "Newton Raphson",
+  "generador": "newton_raphson",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Aproxime la raíz de {funcion} con el método de Newton-Raphson partiendo de x0 = 1.",
+  "intro": [
+    "{funcion}",
+    "{derivada}",
+    "x(i+1) = x(i) - f(x(i)) / f'(x(i))",
+    "error = |x(i+1) - x(i)|; se detiene cuando error < 0.000001.",
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: x{idx} = {it.x0}",
+        "filas": [
+          [
+            "f(x{idx}) = {it.texto_fx} =",
+            {
+              "in": "it.fx",
+              "tol": "it.tol_fx"
+            }
+          ],
+          [
+            "f'(x{idx}) = {it.texto_fpx} =",
+            {
+              "in": "it.fpx",
+              "tol": "it.tol_fpx"
+            }
+          ],
+          [
+            "x{num} = x{idx} - f(x{idx}) / f'(x{idx}) =",
+            {
+              "in": "it.x1",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "error = |x{num} - x{idx}| =",
+            {
+              "in": "it.error",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Resultado:",
+      "filas": [
+        [
+          "Raíz aproximada: x =",
+          {
+            "in": "raiz",
+            "tol": 0.0005
+          }
+        ]
+      ]
+    }
+  ]
+}

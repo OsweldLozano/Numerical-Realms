@@ -1,0 +1,54 @@
+{
+  "titulo": "Jacobi",
+  "nivel": "Jacobi",
+  "generador": "jacobi",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Resuelva el sistema con el método de Jacobi partiendo de x(0) = {inicial}.",
+  "intro": [
+    "Sistema:",
+    {
+      "repetir": "ecuaciones",
+      "como": "ec",
+      "texto": "    {ec}"
+    },
+    "Despejes:",
+    {
+      "repetir": "despejes",
+      "como": "dp",
+      "texto": "    {dp}"
+    },
+    "Todos los despejes de una iteración usan los valores de la iteración anterior.",
+    "Se detiene cuando el error máximo <= 0.001 (máximo 10 iteraciones).",
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}:",
+        "filas": [
+          {
+            "repetir": "it.filas",
+            "como": "v",
+            "fila": [
+              "{v.variable} = {v.texto} =",
+              {
+                "in": "v.valor",
+                "tol": 0.0005
+              }
+            ]
+          },
+          [
+            "Error máximo = máx |xi(nuevo) - xi(anterior)| =",
+            {
+              "in": "it.error",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

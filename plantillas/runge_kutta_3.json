@@ -1,0 +1,48 @@
+{
+  "titulo": "Runge-Kutta 3° Orden",
+  "nivel": "Runge-Kutta 3°Orden",
+  "generador": "runge_kutta_3",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime y({t_final}) con el método de Runge-Kutta de 3° orden en {n} iteraciones.",
+  "intro": [
+    "{funcion}",
+    {
+      "repetir": "iteraciones[0].ks",
+      "como": "k",
+      "texto": "{k.nombre} = {k.formula}"
+    },
+    "y(i+1) = {formula_y}",
+    "Escriba los resultados con 4 decimales.",
+    "Datos:  h = {h}     t0 = {t0}     y0 = y({t0}) = {y0}"
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: t{idx} = {it.t},  y{idx} = {it.y}",
+        "filas": [
+          {
+            "repetir": "it.ks",
+            "como": "k",
+            "fila": [
+              "{k.nombre} = {k.texto} =",
+              {
+                "in": "k.valor",
+                "tol": 0.0005
+              }
+            ]
+          },
+          [
+            "y{num} = {formula_y} =",
+            {
+              "in": "it.yi",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

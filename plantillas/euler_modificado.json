@@ -1,0 +1,54 @@
+{
+  "titulo": "Euler Modificado",
+  "nivel": "Euler Modificado",
+  "generador": "euler_modificado",
+  "tiempo": 900,
+  "decimales": 4,
+  "instruccion": "Aproxime y({t_final}) con el método de euler Modificado en {n} iteraciones.",
+  "intro": [
+    "{funcion}",
+    "Predictor: y*(i+1) = y(i) + h·f(y(i), t(i))",
+    "Corrector: y(i+1) = y(i) + (h/2)·[f(y(i), t(i)) + f(y*(i+1), t(i+1))]",
+    "Escriba los resultados con 4 decimales.",
+    "Datos:  h = {h}     t0 = {t0}     y0 = y({t0}) = {y0}"
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: t{idx} = {it.t0},  y{idx} = {it.y0}",
+        "filas": [
+          [
+            "f(y{idx}, t{idx}) = {it.texto_f0} =",
+            {
+              "in": "it.f0",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "Predictor: y*{num} = y{idx} + h·f(y{idx}, t{idx}) =",
+            {
+              "in": "it.y1",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "f(y*{num}, t{num}) = {it.texto_f1} =",
+            {
+              "in": "it.f1",
+              "tol": 0.0005
+            }
+          ],
+          [
+            "Corrector: y{num} = y{idx} + (h/2)·[f(y{idx}, t{idx}) + f(y*{num}, t{num})] =",
+            {
+              "in": "it.yi",
+              "tol": 0.0005
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

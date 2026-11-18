@@ -1,0 +1,51 @@
+{
+  "titulo": "Punto Fijo",
+  "nivel": "Punto fijo",
+  "generador": "punto_fijo",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Aproxime la solución de {funcion} con el método de punto fijo partiendo de x0 = 0.",
+  "intro": [
+    "{funcion}",
+    "x(i+1) = g(x(i))",
+    "error = |x(i+1) - x(i)|; se detiene cuando error < 0.00001 (máximo 9 iteraciones).",
+    "Escriba los resultados con 4 decimales."
+  ],
+  "pasos": [
+    {
+      "repetir": "iteraciones",
+      "como": "it",
+      "paso": {
+        "titulo": "Paso {paso}. Iteración {num}: x{idx} = {it.x0}",
+        "filas": [
+          [
+            "x{num} = g(x{idx}) = {it.texto_g} =",
+            {
+              "in": "it.x1",
+              "tol": "it.tol_g"
+            }
+          ],
+          [
+            "error = |x{num} - x{idx}| =",
+            {
+              "in": "it.error",
+              "tol": "it.tol_g + 0.0001"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. Resultado:",
+      "filas": [
+        [
+          "Raíz aproximada: x =",
+          {
+            "in": "raiz",
+            "tol": 0.0005
+          }
+        ]
+      ]
+    }
+  ]
+}

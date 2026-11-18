@@ -6,7 +6,7 @@
   "instruccion": "Calcule g({x}) con el polinomio de Lagrange usando la tabla de {n} puntos.",
   "intro": [
     "g(x) = y0·L0(x) + y1·L1(x) + ...",
-    "Li(x) = producto de (x - xj) / producto de (xi - xj), con j ≠ i",
+    "Li(x) = producto de (x - xj) / producto de (xi - xj), con j distinto de i",
     "Datos:  x = {x}",
     {"repetir": "tabla", "como": "p", "texto": "x{idx} = {p[0]}        y{idx} = {p[1]}"}
   ],

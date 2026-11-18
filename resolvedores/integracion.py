@@ -1,16 +1,21 @@
+"""
+Resolvedor de los métodos de integración numérica (código de Vanessa).
+
+Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
+    * intervalos(): con funciones que no son polinomios (exp, sqrt, log, sin...) numpy no
+      acepta Fraction y el programa tronaba. Ahora, si falla, evalúa con float.
+    * NCC[8]: el factor es 4/14175 (decía 14/14175) y el coeficiente central 10496 (decía 10946).
+    * NCC[9]: los coeficientes centrales son 5778 (decía 5788).
+
+Nota: Regla3_8Simpson solo da el valor correcto con n = 3 (la fórmula no es la compuesta);
+el generador de niveles siempre usa n = 3.
+"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
-import numpy as np
-import os
-import shutil
-from pathlib import Path
-from enum import Enum
-
 
 
 """  Metodos  """
-
 def ReglaTrapezoidal(integral):
     expresion, a, b, n = integral.funcion, integral.a, integral.b, integral.n
     h = (b - a)/n 
@@ -112,12 +117,11 @@ def NewtonCotesAbiertas(integral):
 
 # Integral definida
 class integralDefinida:
-    def __init__(self):
-        print("Integral definida")
-        self.funcion = sp.sympify(input("Funcion: "))
-        self.a = Fraction(input("Valor inicial(a): "))
-        self.b = Fraction(input("Valor final(b): "))
-        self.n = int(input("Numero de intervalos(n): "))
+    def __init__(self,funcion,a,b,n):
+        self.funcion = sp.sympify(funcion)
+        self.a = Fraction(a)
+        self.b = Fraction(b)
+        self.n = int(n)
 
 # Constantes para las fórmulas Cerradas de Newton – Cotes
 NCC = {
@@ -128,8 +132,8 @@ NCC = {
     5: [Fraction("5/288"), 19, 75, 50, 50, 75, 19],
     6: [Fraction("1/140"), 41, 216, 27, 272, 27, 216, 41],
     7: [Fraction("7/17280"), 751, 3577, 1323, 2989, 2989, 1323, 3577, 751],
-    8: [Fraction("14/14175"), 989, 5888, -928, 10946, -4540, 10946, -928, 5888, 989],
-    9: [Fraction("9/89600"), 2857, 15741, 1080, 19344, 5788, 5788, 19344, 1080, 15741, 2857],
+    8: [Fraction("4/14175"), 989, 5888, -928, 10496, -4540, 10496, -928, 5888, 989],      # CORREGIDO
+    9: [Fraction("9/89600"), 2857, 15741, 1080, 19344, 5778, 5778, 19344, 1080, 15741, 2857],  # CORREGIDO
     10: [Fraction("5/299376"), 16067, 106300, -48525, 272400, -260550, 427368, -260550, 272400, -48525, 106300, 16067]
 }
 
@@ -154,7 +158,10 @@ def intervalos(expresion, n, a, h):
         paso = {}
     
         valor = a + i*h
-        resultado = funcion(valor)
+        try:
+            resultado = funcion(valor)
+        except (TypeError, AttributeError):   # CORREGIDO: numpy no acepta Fraction en exp, sqrt...
+            resultado = funcion(float(valor))
     
         lista.append(resultado)
         paso = {

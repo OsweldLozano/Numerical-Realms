@@ -1,36 +1,58 @@
 {
   "titulo": "Eliminación Gaussiana",
+  "nivel": "Eliminacion Gaussiana",
   "generador": "eliminacion_gaussiana",
-  "parametros": {"tam": 3},
-  "tiempo": 720,
+  "tiempo": 1200,
   "decimales": 4,
-  "instruccion": "Resuelva el sistema de {tam} ecuaciones mediante eliminación de Gauss. Puede escribir fracciones (7/3) o decimales.",
+  "instruccion": "Resuelva el sistema con eliminación gaussiana: haga 1 cada pivote, ceros debajo de él y luego sustitución hacia atrás.",
   "intro": [
     "Sistema:",
-    {"repetir": "ecuaciones", "como": "ec", "texto": "    {ec}"}
+    {
+      "repetir": "ecuaciones",
+      "como": "ec",
+      "texto": "    {ec}"
+    },
+    "Puede escribir fracciones (7/3) o decimales."
   ],
   "pasos": [
     {
       "titulo": "Paso {paso}. Escriba la matriz aumentada [A | b]:",
       "filas": [
-        [{"matriz": "Ab", "casillas": "todas"}]
+        [
+          {
+            "matriz": "Ab",
+            "casillas": "todas"
+          }
+        ]
       ]
     },
     {
-      "repetir": "etapas", "como": "et",
+      "repetir": "etapas",
+      "como": "et",
       "paso": {
-        "titulo": "Paso {paso}. Haga ceros debajo del pivote de la columna {et.columna}: {et.operaciones}",
+        "titulo": "Paso {paso}. Columna {et.k} (pivote {et.pivote}): {et.operaciones}",
         "filas": [
-          [{"matriz": "et.matriz", "casillas": "et.editables", "decimales": 4}]
+          [
+            {
+              "matriz": "et.matriz",
+              "casillas": "et.editables"
+            }
+          ]
         ]
       }
     },
     {
-      "repetir": "sustitucion", "como": "s",
+      "repetir": "sustitucion",
+      "como": "s",
       "paso": {
-        "titulo": "Paso {paso}. Sustitución hacia atrás. Despeje {s.variable}:",
+        "titulo": "Paso {paso}. Sustitución hacia atrás: despeje {s.variable}",
         "filas": [
-          ["{s.variable} = {s.formula} =", {"in": "s.valor"}]
+          [
+            "{s.variable} = {s.formula} =",
+            {
+              "in": "s.valor"
+            }
+          ]
         ]
       }
     }

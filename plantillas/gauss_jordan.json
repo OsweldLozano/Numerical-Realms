@@ -1,0 +1,60 @@
+{
+  "titulo": "Gauss-Jordan",
+  "nivel": "Gauss-Jordan",
+  "generador": "gauss_jordan",
+  "tiempo": 1200,
+  "decimales": 4,
+  "instruccion": "Resuelva el sistema con Gauss-Jordan: haga 1 cada pivote y ceros arriba y abajo de él.",
+  "intro": [
+    "Sistema:",
+    {
+      "repetir": "ecuaciones",
+      "como": "ec",
+      "texto": "    {ec}"
+    },
+    "Puede escribir fracciones (7/3) o decimales."
+  ],
+  "pasos": [
+    {
+      "titulo": "Paso {paso}. Escriba la matriz aumentada [A | b]:",
+      "filas": [
+        [
+          {
+            "matriz": "Ab",
+            "casillas": "todas"
+          }
+        ]
+      ]
+    },
+    {
+      "repetir": "etapas",
+      "como": "et",
+      "paso": {
+        "titulo": "Paso {paso}. Columna {et.k} (pivote {et.pivote}): {et.operaciones}",
+        "filas": [
+          [
+            {
+              "matriz": "et.matriz",
+              "casillas": "et.editables"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "titulo": "Paso {paso}. La solución es la última columna:",
+      "filas": [
+        {
+          "repetir": "solucion",
+          "como": "s",
+          "fila": [
+            "{s.variable} =",
+            {
+              "in": "s.valor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
