@@ -1,110 +1,3 @@
-"""
-Constructor de niveles: PLANTILLA (JSON base del nivel) + DATOS (generador y resolvedor)
--> NIVEL listo para jugar (el mismo formato que lee nivel_generico.py).
-
-    plantillas/biseccion.json  ──┐
-                                 ├──> constructor_niveles.py ──> nivel (dict) ──> nivel_generico
-    generadores/...py  ──> datos ┘
-
-Cada vez que el jugador abre un nivel se genera un problema nuevo, se resuelve y se
-arma el nivel con los valores de esa solución.
-
-
-QUÉ VA EN CADA LUGAR
---------------------
-* La PLANTILLA dice cómo se ve el nivel: instrucción, pasos, qué se escribe en cada
-  casilla. No lleva números del problema, solo referencias a los datos ({x0}, "m"...).
-* El GENERADOR (una función en la carpeta generadores/) crea un problema aleatorio, lo
-  resuelve y devuelve un diccionario con TODO lo que la plantilla necesita: los datos del
-  problema y los valores intermedios del proceso de solución. Ver generadores/__init__.py.
-
-
-FORMATO DE LA PLANTILLA
------------------------
-{
-  "titulo":      "Bisección",               # obligatorio; texto de la píldora (admite {...})
-  "nivel":       "Bisectriz",               # opcional: nombre del nivel en estructura.json con el
-                                            #   que se enlaza (si falta, se usa "titulo")
-  "generador":   "biseccion",               # obligatorio: nombre registrado en generadores/
-  "parametros":  {"iteraciones": 4},        # opcional: se pasan al generador
-  "tiempo":      600,                       # opcional, segundos (def. 600)
-  "decimales":   4,                         # opcional: cifras con que se muestran y se califican
-                                            #   los números (def. 4)
-  "tolerancia":  1e-6,                      # opcional: tolerancia fija para TODAS las casillas
-                                            #   (si falta, cada casilla acepta lo que redondea igual
-                                            #   a "decimales": 1.0986 vale para 1.098612...)
-  "instruccion": "Aproxime la raíz de {funcion} en [{a}, {b}]...",
-  "intro":       ["{funcion}", ...],        # opcional
-  "pasos": [ ...pasos... ]
-}
-
-Textos con datos:  "Datos: x0={x0}  y0={y0}"
-    Lo que va entre llaves es una EXPRESIÓN sobre los datos: {x0}, {y1 - y0}, {it.c},
-    {A[0][1]}, {abs(error)}. Para fijar el formato: {m:.2f}. Para escribir una llave
-    literal: {{ o }}.
-
-Un paso:
-    {"titulo": "Paso {paso}. Calcule la pendiente:",      # {paso} = número del paso, automático
-     "filas": [ ["m =", {"in": "m"}],  ... ]}
-
-Tokens de una fila:
-    "texto {dato}"                    etiqueta fija (con datos)
-    5                                 etiqueta fija
-    {"in": "m"}                       casilla; la respuesta es la expresión "m" evaluada.
-                                      Opcional: "decimales" (redondea la respuesta y acepta
-                                      cualquier valor que redondee igual; si falta se usan los
-                                      "decimales" de la plantilla), "tol" (margen de error; úsalo
-                                      en resultados que el jugador calcula con valores ya
-                                      redondeados), "ancho", "limite".
-                                      Si no indicas "ancho", se ajusta a la longitud del número.
-    {"in": 7}                         casilla con respuesta fija (no depende de los datos)
-    {"matriz": "Ab", "casillas": "todas"}
-                                      matriz tomada de los datos. "casillas" dice qué celdas se
-                                      llenan: "todas", "ninguna", una lista [[fila, col], ...]
-                                      (desde 0) o una expresión que dé esa lista ("et.editables").
-                                      Admite "decimales" y "tol" para las casillas.
-    {"matriz": [[1, {"in": "a"}], ["{b}", 4]]}
-                                      matriz escrita a mano (celdas: texto, número o casilla)
-
-REPETIR (número variable de pasos o filas: iteraciones, etapas de eliminación...)
-    {"repetir": "iteraciones", "como": "it", "max": 6,
-     "paso": {"titulo": "Iteración {num}: ...", "filas": [["c =", {"in": "it.c"}]]}}
-
-    Recorre la lista de los datos "iteraciones" (o range(n) si la expresión da un entero)
-    y crea un paso por elemento. Dentro están disponibles:
-        it     el elemento ("como"; por defecto "elem")     num    1, 2, 3...
-        idx    0, 1, 2...                                   total  cuántos elementos hay
-    "max" (opcional) limita cuántos se usan. Lo mismo sirve dentro de "filas" con "fila":
-        {"repetir": "puntos", "como": "p", "fila": ["x{num} =", {"in": "p.x"}]}
-    y dentro de "intro" con "texto":
-        {"repetir": "ecuaciones", "como": "ec", "texto": "{ec}"}
-
-CONDICIONES:  cualquier paso, fila, texto o "repetir" puede llevar "si": "expresión";
-    se omite cuando la expresión es falsa. Ej.: {"si": "convergio", "paso": {...}}
-
-EXPRESIONES: números, + - * / // % **, comparaciones, and/or/not, "x if c else y",
-    acceso a datos (it.c o it["c"], A[0][1]) y las funciones abs, round, min, max, len,
-    sum, sqrt, exp, log, sin, cos, tan (y las constantes pi, e). Nada más se ejecuta.
-    par(v) escribe el número entre paréntesis si es negativo, para restas legibles:
-    "{a} - {par(b)}" da "5 - (-3)" o "5 - 3".
-
-
-USO DESDE LA TERMINAL
----------------------
-    python constructor_niveles.py                              # prueba todas las plantillas
-    python constructor_niveles.py plantillas/biseccion.json    # muestra un nivel generado (JSON)
-        --semilla 7       mismo problema siempre (para depurar)
-        --datos           muestra también los datos que devolvió el generador
-        --probar 500      genera 500 problemas para encontrar casos que fallen
-        --jugar           abre el nivel generado en una ventana
-    python constructor_niveles.py --exportar niveles.json       # un nivel fijo por plantilla
-
-USO DESDE PYTHON
-----------------
-    plantilla = cargar_plantilla("plantillas/biseccion.json")
-    nivel = generar_nivel(plantilla)              # problema nuevo, resuelto y armado
-    nivel = construir_nivel(plantilla, datos)     # o con datos que ya tengas
-"""
 import argparse
 import ast
 import glob
@@ -156,7 +49,7 @@ def normalizar_datos(v):
     if isinstance(v, float):
         return v
     try:
-        return float(v)                                              # otros números
+        return float(v)                                       
     except (TypeError, ValueError):
         return str(v)
 
@@ -199,12 +92,12 @@ def evaluar(expr, ctx, ruta):
         return _ev(arbol, ctx, ruta, expr)
     except ErrorPlantilla:
         raise
-    except Exception as e:                      # división entre cero, índice fuera de rango...
+    except Exception as e:                     
         _err(ruta, f"al evaluar {expr!r}: {type(e).__name__}: {e}")
 
 
 def _ev(n, ctx, ruta, expr):
-    ev = lambda x: _ev(x, ctx, ruta, expr)      # noqa: E731
+    ev = lambda x: _ev(x, ctx, ruta, expr)    
     if isinstance(n, ast.Constant):
         return n.value
     if isinstance(n, ast.Name):

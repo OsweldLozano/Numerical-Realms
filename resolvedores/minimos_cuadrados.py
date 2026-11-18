@@ -1,12 +1,3 @@
-"""
-Resolvedor de los métodos de mínimos cuadrados (código de Vanessa).
-Arma la matriz de las ecuaciones normales [A | b]; el sistema se resuelve aparte (el
-generador de niveles usa GaussJordan de resolvedores/lineales.py).
-
-La línea marcada con "# CORREGIDO" es el único cambio respecto al original:
-    * ValorSympy: con funciones de valor irracional (sin, exp, log, sqrt...) tronaba, porque
-      Fraction() no acepta el Float de sympy. Ahora se convierte primero a float.
-"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
@@ -166,7 +157,7 @@ def ValorSympy(tabla,expresion,calculo):
             if valor.is_rational:
                 valor = Fraction(valor.p, valor.q) #Fraction
             else:
-                valor = float(valor.evalf()) #Float      # CORREGIDO: Fraction no acepta el Float de sympy
+                valor = float(valor.evalf()) #Float 
             lista.append(Fraction(valor))
         valores[clave] = lista.copy()
     return valores

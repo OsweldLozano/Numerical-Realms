@@ -1,22 +1,3 @@
-"""
-Creador de niveles del submapa Ecuaciones Lineales.
-
-Cada función registrada:
-    1. genera un sistema 3x3 aleatorio con solución entera;
-    2. lo resuelve con el resolvedor de Vanessa (resolvedores/lineales.py);
-    3. agrega lo que usan las plantillas: las ecuaciones en texto, las operaciones de renglón
-       de cada etapa, qué celdas de cada matriz llena el jugador y las sustituciones con los
-       números ya puestos. El resolvedor no se modifica para eso.
-
-Métodos directos (Montante, Gauss-Jordan, Eliminación Gaussiana): se repite el sistema hasta
-que todos los valores intermedios sean números cómodos (decimales exactos de hasta 4 cifras y
-no muy grandes; en Montante, enteros pequeños). Así el jugador no arrastra redondeos.
-Métodos iterativos (Gauss-Seidel, Jacobi): la matriz es diagonalmente dominante, para que
-converjan.
-
-Plantillas: plantillas/montante.json, gauss_jordan.json, eliminacion_gaussiana.json,
-gauss_seidel.json y jacobi.json.
-"""
 from fractions import Fraction
 
 from generadores import registrar

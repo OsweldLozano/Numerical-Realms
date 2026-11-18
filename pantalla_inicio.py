@@ -1,33 +1,3 @@
-"""
-Pantalla de inicio: título central, botones Iniciar / Salir y dos íconos
-superiores (opciones y sonido).
-
-Archivos que busca (todos reemplazables):
-    assets/fondos/inicio.jpg             fondo (ideal 1600x900; se escala para cubrir la pantalla)
-    assets/iconos/opciones.svg           ícono de opciones (esquina superior izquierda)
-    assets/iconos/sonido.svg             ícono de sonido activo (esquina superior derecha)
-    assets/iconos/sonido_off.svg         ícono de sonido silenciado
-    assets/tipografia/JacquesFrancois.ttf  (opcional) tipografía del título
-
-La pantalla se dibuja en la resolución lógica de ventana.py (1600x900) y pygame la
-escala al monitor. F11 alterna pantalla completa / ventana.
-
-Si falta el JPG se dibuja un degradado; si falla un SVG se dibuja un ícono simple.
-
-Uso:
-    pip install pygame-ce pygame-gui
-    python pantalla_inicio.py
-
-Para integrarla en tu juego:
-    inicio = PantallaInicio()
-    while True:
-        accion = inicio.ejecutar()      # "iniciar" | "salir" | "opciones"
-        if accion == "opciones":
-            ...abrir tu pantalla de opciones...
-            continue
-        break
-    # inicio.sonido guarda si el sonido está activo (True/False)
-"""
 import io
 import json
 import math

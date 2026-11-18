@@ -1,16 +1,3 @@
-"""
-Resolvedor de los métodos de ecuaciones diferenciales ordinarias (código de Vanessa).
-La ecuación es y' = f(y, t) (en orden superior, y'' = f(yp, y, t)).
-
-Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
-    * EulerModificado y EulerHaciaAtras: desde la segunda iteración el corrector se
-      desfasaba (tomaba el predictor anterior como yi y el valor corregido como predictor).
-      Ahora cada iteración avanza desde el valor corregido y calcula su predictor con Euler
-      hacia adelante. yn1 sigue siendo el predictor de la primera iteración.
-    * RungeKutta3Orden: k3 = h·f(y0 - k1 + 2·k2, t0 + h)   (decía y0 - k2)
-    * RungeKutta4Orden3_8Simpson: k3 = h·f(y0 - k1/3 + k2, t0 + 2h/3)   (decía y0 + k1/3 + k2/3)
-    * RK2, RK3 y RK4: en los diccionarios de k2, k3 y k4, "k" guardaba k1.
-"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
@@ -39,10 +26,10 @@ def EulerModificado(expresion, h, yn, yn1, tn=0, n=2):
         }
         iteraciones.append(iteracion.copy())
 
-        y0 = yi                         # CORREGIDO: se avanza desde el valor corregido
+        y0 = yi                         
         t0 = t1
         t1 = t1+h
-        y1 = y0 + h*funcion(y0, t0)     # CORREGIDO: predictor de la siguiente iteración
+        y1 = y0 + h*funcion(y0, t0)     
 
     datos={
         "expresion": expresion,
@@ -94,8 +81,8 @@ def EulerHaciaAtras(expresion, yn, yn1, h, tn=0, n=2):
         }
         iteraciones.append(iteracion.copy())
 
-        y0 = yi                         # CORREGIDO: se avanza desde el valor corregido
-        y1 = y0 + h*funcion(y0, t1)     # CORREGIDO: predictor de la siguiente iteración
+        y0 = yi                         
+        y1 = y0 + h*funcion(y0, t1)     
         t1 = t1+h
 
     datos={
@@ -118,7 +105,7 @@ def RungeKutta2Orden(expresion, h, yn, tn=0, n=2):
 
         iteracion={
             "k1": {"k":k1,"h":h,"y":y0,"t":t0},
-            "k2": {"k":k2,"h":h,"y":y0+k1,"t":t0+h},   # CORREGIDO: "k" guardaba k1
+            "k2": {"k":k2,"h":h,"y":y0+k1,"t":t0+h},  
             "yi": {"yi":yi,"k1":k1,"k2":k2}
         }
         iteraciones.append(iteracion.copy())
@@ -142,13 +129,13 @@ def RungeKutta3Orden(expresion, h, yn, tn=0, n=2):
     for i in range(1,n+1):
         k1 = h*funcion(y0,t0)
         k2 = h*funcion(y0 + k1/2, t0 + h/2)
-        k3 = h*funcion(y0 - k1 + 2*k2, t0 + h)       # CORREGIDO: decía y0 - k2
+        k3 = h*funcion(y0 - k1 + 2*k2, t0 + h)      
         yi = y0 + (1/6)*(k1 + 4*k2 + k3)
 
         iteracion={
             "k1": {"k":k1,"h":h,"y":y0,"t":t0},
             "k2": {"k":k2,"h":h,"y":y0 + k1/2,"t":t0 + h/2},
-            "k3": {"k":k3,"h":h,"y":y0 - k1 + 2*k2,"t":t0 + h},   # CORREGIDO
+            "k3": {"k":k3,"h":h,"y":y0 - k1 + 2*k2,"t":t0 + h},   
             "yi": {"yi":yi,"k1":k1,"k2":k2,"k3":k3}
         }
         iteraciones.append(iteracion.copy())
@@ -204,14 +191,14 @@ def RungeKutta4Orden3_8Simpson(expresion, h, yn, tn=0, n=2):
     for i in range(1,n+1):
         k1 = h*funcion(y0,t0)
         k2 = h*funcion(y0 + k1/3, t0 + h/3)
-        k3 = h*funcion(y0 - k1/3 + k2, t0 + h*(2/3))   # CORREGIDO: decía y0 + k1/3 + k2/3
+        k3 = h*funcion(y0 - k1/3 + k2, t0 + h*(2/3))   
         k4 = h*funcion(y0 + k1 - k2 + k3, t0 + h)
         yi = y0 + (1/8)*(k1 + 3*k2 + 3*k3 + k4)
 
         iteracion={
             "k1": {"k":k1,"h":h,"y":y0,"t":t0},
             "k2": {"k":k2,"h":h,"y":y0 + k1/3,"t":t0 + h/3},
-            "k3": {"k":k3,"h":h,"y":y0 - k1/3 + k2,"t":t0 + h*(2/3)},   # CORREGIDO
+            "k3": {"k":k3,"h":h,"y":y0 - k1/3 + k2,"t":t0 + h*(2/3)},  
             "k4": {"k":k4,"h":h,"y":y0 + k1 - k2 + k3,"t":t0 + h},
             "yi": {"yi":yi,"k1":k1,"k2":k2,"k3":k3,"k4":k4}
         }

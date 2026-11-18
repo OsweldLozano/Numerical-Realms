@@ -1,17 +1,3 @@
-"""
-Creador de niveles del submapa Interpolación.
-
-Cada función registrada:
-    1. genera un problema aleatorio (generar_problema_*), con números cómodos para hacer las
-       cuentas a mano;
-    2. lo resuelve con el resolvedor de Vanessa (resolvedores/interpolacion.py);
-    3. agrega al resultado los textos y la organización que usan las plantillas (por ejemplo,
-       las diferencias separadas por orden o las fórmulas de cada término). El resolvedor no
-       se modifica para eso: todo lo extra se calcula aquí a partir de lo que devuelve.
-
-Plantillas: plantillas/interpolacion_lineal.json, newton_adelante.json, newton_atras.json,
-newton_diferencias_divididas.json y lagrange.json.
-"""
 import sympy as sp
 
 from generadores import registrar

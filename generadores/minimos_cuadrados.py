@@ -1,28 +1,3 @@
-"""
-Creador de niveles del submapa Mínimos Cuadrados.
-
-Cada función registrada:
-    1. genera una tabla de puntos aleatoria: x enteras consecutivas y y = (un modelo con
-       coeficientes enteros) + un poco de ruido, para que el ajuste no sea exacto;
-    2. arma las ecuaciones normales con el resolvedor de Vanessa
-       (resolvedores/minimos_cuadrados.py) y resuelve el sistema con su GaussJordan
-       (resolvedores/lineales.py);
-    3. agrega lo que usan las plantillas: las sumatorias con nombre legible (Σx², Σxy...),
-       la matriz, los coeficientes y las tolerancias.
-
-TOLERANCIAS: en los modelos polinomiales todas las sumatorias son enteras. En los modelos con
-función (sen, e^x, ln...) el jugador suma valores redondeados a 4 decimales, así que cada
-sumatoria lleva una tolerancia según cuánto pesa f(x) en sus términos. La de cada coeficiente
-se obtiene simulando al jugador: calcula f(x) con 4 decimales, arma las sumatorias con esos
-valores y resuelve el sistema redondeando a DECIMALES_SISTEMA (6) decimales en cada operación
-(la plantilla le pide al jugador usar al menos 6); la tolerancia es 3 veces lo que se aleja,
-más un margen. Se descartan los problemas en los que eso pasa de TOL_MAXIMA (sistemas tan
-sensibles que ni con cuentas cuidadosas se llega al resultado). Por eso raíz(x) no se usa en
-el modelo cuadrático con función: con x = 1...6 se parece demasiado a 1, x y x².
-
-Plantillas: plantillas/linea_recta.json, cuadratica.json, cubica.json,
-lineal_con_funcion.json y cuadratica_con_funcion.json.
-"""
 from fractions import Fraction
 
 import numpy as np

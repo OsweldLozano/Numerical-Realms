@@ -1,20 +1,3 @@
-"""
-Resolvedor de los métodos de ecuaciones no lineales (código de Vanessa).
-
-Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
-    * NewtonRaphson, PuntoFijo, FalsaPosicion y Secante: iteraciones.append(iteracion = {...})
-      da TypeError (append no acepta argumentos con nombre). Ahora es iteraciones.append({...}).
-    * Bisectriz: el signo de f(c) se revisaba con "valor < 0" en lugar de "f_valor < 0", el
-      intervalo se actualizaba igual sin importar si f crece o decrece, y el paro comparaba x
-      con la tolerancia en lugar del error. Ahora: si f(a)·f(c) < 0 la raíz está en [a, c];
-      si no, en [c, b]; y se detiene cuando el error <= tol.
-    * FalsaPosicion: siempre reemplazaba a, aunque la raíz quedara del otro lado (solo era
-      correcto cuando el extremo b se queda fijo). Ahora usa el signo de f(x), como bisección.
-      En los casos en que b se queda fijo, los resultados son los mismos que antes.
-    * NewtonRaphson y PuntoFijo: "valor_final" devolvía la penúltima aproximación.
-    * Secante: en "error", "xi" y "x0" guardaban las dos aproximaciones anteriores en lugar
-      de las dos con las que se calcula el error.
-"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
@@ -81,7 +64,7 @@ def Bisectriz(funcion):
 
         f_valor = f_num(valor)
         if (f_valor >= 0): comportamiento = "+"
-        else: comportamiento = "-"                 # CORREGIDO: decía "elif(valor < 0)"
+        else: comportamiento = "-"                
 
         iteracion={
             "a": a,
@@ -92,10 +75,10 @@ def Bisectriz(funcion):
         }
         iteraciones.append(iteracion.copy())
 
-        if f_num(a)*f_valor < 0: b = valor         # CORREGIDO: la raíz está en [a, c]
-        else: a = valor                             # CORREGIDO: la raíz está en [c, b]
+        if f_num(a)*f_valor < 0: b = valor         
+        else: a = valor                             
 
-        if(round(error, 3) <= tol):                 # CORREGIDO: decía round(valor, 3)
+        if(round(error, 3) <= tol):                
             break 
 
         x_anterior = valor
@@ -119,7 +102,7 @@ def NewtonRaphson(funcion):
     max_iter = 10
 
     iteraciones = []
-    iteraciones.append({                  # CORREGIDO: sin "iteracion ="
+    iteraciones.append({               
         "iteracion": 0,
         "xi": xi,
         "error": "---",
@@ -140,7 +123,7 @@ def NewtonRaphson(funcion):
         }
         iteraciones.append(iteracion.copy())
 
-        xi = x_nuevo                                # CORREGIDO: antes de salir, para valor_final
+        xi = x_nuevo                          
         if(error < tol): break
 
     datos={
@@ -160,7 +143,7 @@ def PuntoFijo(funcion):
     max_iter = 10
 
     iteraciones = []
-    iteraciones.append({                  # CORREGIDO: sin "iteracion ="
+    iteraciones.append({               
         "iteracion": 0,
         "xi": xi,
         "error": "---",
@@ -179,7 +162,7 @@ def PuntoFijo(funcion):
         }
         iteraciones.append(iteracion.copy())
 
-        xi = x_nuevo                                # CORREGIDO: antes de salir, para valor_final
+        xi = x_nuevo                              
         if(error < tol):
             break
     
@@ -205,7 +188,7 @@ def FalsaPosicion(funcion):
     max_iter = 10
     
     iteraciones = []
-    iteraciones.append({                  # CORREGIDO: sin "iteracion ="
+    iteraciones.append({                 
         "iteracion": 0,
         "b": b,
         "f(b)": f_b,
@@ -215,10 +198,10 @@ def FalsaPosicion(funcion):
         "error": "---",
     })
 
-    x_anterior = a                                  # CORREGIDO: aproximación anterior
+    x_anterior = a                              
     for i in range(1,max_iter):
         xi = a - ((f_a * (b - a))/(f_b - f_a))
-        error = abs(x_anterior - xi)                # CORREGIDO: decía abs(a - xi)
+        error = abs(x_anterior - xi)             
 
         iteracion ={
             "iteracion": i,
@@ -227,14 +210,14 @@ def FalsaPosicion(funcion):
             "a": a,
             "f(a)": f_a,
             "x": xi,
-            "error": {"error":error, "xi":xi, "x0":x_anterior},   # CORREGIDO
+            "error": {"error":error, "xi":xi, "x0":x_anterior},  
         }
         iteraciones.append(iteracion.copy())
 
         if(round(error, 3) <= tol):
             break
 
-        f_xi = f_num(xi)                            # CORREGIDO: se conserva el lado con cambio de signo
+        f_xi = f_num(xi)                            
         if f_a*f_xi < 0: b, f_b = xi, f_xi
         else: a, f_a = xi, f_xi
         x_anterior = xi
@@ -259,13 +242,13 @@ def Secante(funcion):
     f_Xi = f_num(xi)
 
     iteraciones = []
-    iteraciones.append({                  # CORREGIDO: sin "iteracion ="
+    iteraciones.append({                  
         "iteracion": 0,
         "x": x0,
         "f(x)": f_X0,
         "error": "---",
     })
-    iteraciones.append({                  # CORREGIDO: sin "iteracion ="
+    iteraciones.append({          
         "iteracion": 1,
         "x": xi,
         "f(x)": f_Xi,

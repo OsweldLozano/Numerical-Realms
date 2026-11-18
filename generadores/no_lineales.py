@@ -1,24 +1,3 @@
-"""
-Creador de niveles del submapa Ecuaciones No Lineales.
-
-Cada función registrada:
-    1. genera una función aleatoria (f(x), o g(x) en punto fijo) de familias con una raíz que
-       no es entera, para que el método tenga trabajo;
-    2. la resuelve con el resolvedor de Vanessa (resolvedores/no_lineales.py), que elige solo
-       el intervalo (tabulación) o usa sus puntos iniciales fijos (Newton x0 = 1, secante
-       x0 = 0 y x1 = 1, punto fijo x0 = 0);
-    3. revisa que el método haya llegado cerca de una raíz (si no, genera otra función) y
-       agrega lo que usan las plantillas: el texto de cada sustitución, f(x) en cada punto, el
-       nuevo intervalo y las tolerancias.
-
-TOLERANCIAS: en cada iteración se muestran los valores anteriores con 4 decimales y el jugador
-evalúa con esos números redondeados. Al evaluar f, el error que eso produce es |f'(x)|·0.00005,
-así que cada evaluación lleva su tolerancia calculada con la derivada ("tol_f..."). Las
-aproximaciones (c, x) llevan una tolerancia fija en la plantilla.
-
-Plantillas: plantillas/grafica.json, biseccion.json, falsa_posicion.json,
-newton_raphson.json, punto_fijo.json y secante.json.
-"""
 import math
 
 import sympy as sp

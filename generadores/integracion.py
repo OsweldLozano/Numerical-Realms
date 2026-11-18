@@ -1,22 +1,3 @@
-"""
-Creador de niveles del submapa Integración Numérica.
-
-Cada función registrada:
-    1. genera un problema aleatorio: una función, un intervalo [a, b] y el número de
-       subintervalos n, con h = 0.25 o 0.5 para que las x sean cómodas;
-    2. lo resuelve con el resolvedor de Vanessa (resolvedores/integracion.py);
-    3. agrega lo que usan las plantillas: cada punto con su x, el texto de la sustitución, su
-       peso en la fórmula, las sumas parciales y las tolerancias. El resolvedor no se modifica
-       para eso: todo lo extra se calcula aquí a partir de lo que devuelve. Como revisión, se
-       comprueba que las sumas den la misma integral que calculó el resolvedor.
-
-TOLERANCIAS: el jugador escribe f(xi) con 4 decimales y con esos valores redondeados calcula
-las sumas. El error que eso arrastra crece con los pesos (en Newton-Cotes hay pesos como 272),
-así que cada casilla lleva una tolerancia calculada para su caso: "tol", "tol_suma", "tol_l".
-
-Plantillas: plantillas/regla_trapezoidal.json, simpson_1_3.json, simpson_3_8.json,
-newton_cotes_cerradas.json y newton_cotes_abiertas.json.
-"""
 from fractions import Fraction
 
 from generadores import registrar

@@ -1,22 +1,3 @@
-"""
-Creador de niveles del submapa Ecuaciones Diferenciales Ordinarias.
-
-Cada función registrada:
-    1. genera un problema aleatorio: y' = f(y, t) (o y'' = f(y', y, t)), condiciones
-       iniciales, h y número de iteraciones;
-    2. lo resuelve con el resolvedor de Vanessa (resolvedores/edo.py);
-    3. agrega lo que usan las plantillas: los valores de f en cada evaluación, el texto de la
-       sustitución con los números ya puestos ("0.1 + (1.105)") y, en Runge-Kutta, la lista de
-       las k con su fórmula. El resolvedor no se modifica para eso.
-
-Los números que aparecen en las sustituciones están redondeados a 4 decimales, igual que los
-que escribe el jugador. Por eso las casillas tienen tolerancia: con valores redondeados, los
-resultados pueden diferir un poco del cálculo exacto (ver "tol" en las plantillas).
-
-Plantillas: plantillas/euler_adelante.json, euler_atras.json, euler_modificado.json,
-runge_kutta_2.json, runge_kutta_3.json, runge_kutta_4_1_3.json, runge_kutta_4_3_8.json y
-runge_kutta_orden_superior.json.
-"""
 import sympy as sp
 
 from generadores import registrar
@@ -50,7 +31,6 @@ FUNCIONES_2 = [
 
 
 def _n(v):
-    """Número para mostrar dentro de una sustitución: 4 decimales y paréntesis si es negativo."""
     t = num(float(v))
     return f"({t})" if t.startswith("-") else t
 
@@ -74,7 +54,6 @@ def generar_problema(rng, orden_superior=False):
 
 
 def _f(p):
-    """f como función de Python (mismo orden de argumentos que el resolvedor)."""
     if "yp0" in p:
         return sp.lambdify([YP, Y, T], sp.sympify(p["expresion"]))
     return sp.lambdify([Y, T], sp.sympify(p["expresion"]))

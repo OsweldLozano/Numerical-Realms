@@ -1,13 +1,3 @@
-"""
-Resolvedor de los métodos de interpolación (código de Vanessa).
-
-Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
-    * InterpolacionLineal: g(x) se evaluaba con el símbolo x en lugar del valor, y "f_a"
-      guardaba f(b).
-    * Newton (adelante, atrás, diferencias divididas): .copy() sobre un número da error
-      (los int y float no tienen .copy()).
-    * Diferencias divididas: en "delta", "x1" y "x0" guardaban y1 y y0.
-"""
 #Librerias
 import sympy as sp
 import numpy as np
@@ -24,7 +14,7 @@ def InterpolacionLineal(valor, a, b, expresion,):
     f_b = funcion(b)
     f_x = funcion(valor)
 
-    g_x = ((f_b - f_a)/(b - a))*(valor - a) + f_a          # CORREGIDO: valor en lugar del símbolo x
+    g_x = ((f_b - f_a)/(b - a))*(valor - a) + f_a       
 
     error = abs(f_x - g_x)
 
@@ -33,7 +23,7 @@ def InterpolacionLineal(valor, a, b, expresion,):
         "a": a,
         "b": b,
         "f_x": f_x,
-        "f_a": f_a,                                         # CORREGIDO: decía f_b
+        "f_a": f_a,                                     
         "f_b": f_b,
         "g_x": g_x,
         "error": error
@@ -76,7 +66,7 @@ def NewtonHaciaAdelante(x, tabla):
     coeficiente.append(tabla[0][1])
     i, j = 0, n
     while(len(coeficiente) < n):
-        coeficiente.append(discriminante[i])               # CORREGIDO: sin .copy()
+        coeficiente.append(discriminante[i])               
         j -= 1
         i += j
 
@@ -144,7 +134,7 @@ def NewtonHaciaAtras(x, tabla):
     coeficiente.append(tabla[-1][1])
     i, j = n-2, n-2
     while(len(coeficiente) < n):
-        coeficiente.append(discriminante[i])               # CORREGIDO: sin .copy()
+        coeficiente.append(discriminante[i])             
         i += j
         j -= 1
 
@@ -200,7 +190,7 @@ def NewtonconDiferenciasDivididas(x, tabla):
             valor = (y1 - y0)/(x1 - x0)
             salida.append(valor)
             diferencia.append(valor)
-            delta.append({"valor":valor,"y1":y1,"y0":y0,"x1":x1,"x0":x0})   # CORREGIDO: x1, x0
+            delta.append({"valor":valor,"y1":y1,"y0":y0,"x1":x1,"x0":x0})  
         entrada = salida.copy()
         salida.clear()  
 
@@ -209,7 +199,7 @@ def NewtonconDiferenciasDivididas(x, tabla):
     coeficiente.append(tabla[0][1])
     i, j = 0, n
     while(len(coeficiente) < n):
-        coeficiente.append(diferencia[i])                  # CORREGIDO: sin .copy()
+        coeficiente.append(diferencia[i])                  
         j -= 1
         i += j       
     

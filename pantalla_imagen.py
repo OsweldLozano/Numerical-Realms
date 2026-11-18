@@ -1,23 +1,3 @@
-"""
-Pantalla de imagen: muestra un fondo a pantalla completa y se quita al presionar cualquier
-tecla, hacer clic o presionar un botón del control.
-
-Se usa para la historia (al presionar "Iniciar"), y en cada nivel para las pantallas
-"inicio", "guia", "final" e "imagen" (ver estructura.py). También para volver a ver la guía
-con la tecla G durante un nivel.
-
-    import pantalla_imagen
-    r = pantalla_imagen.mostrar(pantalla, "assets/historia/inicio.jpg")
-    if r == "salir":                 # se cerró la ventana o el juego pasó a segundo plano
-        ...
-
-* Si la ruta es None o la imagen no se puede abrir, no muestra nada y devuelve "seguir"
-  (así se pueden ir agregando las imágenes poco a poco).
-* La imagen se ve completa, sin recortes (lo ideal es 1600x900, 16:9). Si tiene otra
-  proporción, los huecos se rellenan con la misma imagen oscurecida.
-* Durante los primeros ESPERA segundos se ignoran las teclas, para que el clic o la tecla
-  que abrió la pantalla no la salte antes de que se vea. F11 nunca la salta.
-"""
 import pygame
 
 import ventana

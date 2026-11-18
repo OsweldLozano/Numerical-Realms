@@ -1,37 +1,3 @@
-"""
-Ventana única del juego, a pantalla completa y con resolución lógica fija.
-
-Todo el juego se dibuja como si la pantalla midiera ANCHO x ALTO (1600 x 900, 16:9, el
-mismo tamaño que los fondos). pygame lo escala a la resolución real del monitor
-conservando la proporción: en monitores que no son 16:9 (16:10, 4:3, ultrawide)
-aparecen franjas negras en los bordes, pero el fondo se ve completo y los botones
-quedan siempre sobre el mismo punto del dibujo.
-
-Gracias a la bandera SCALED, pygame también traduce las coordenadas del ratón al
-espacio lógico: los clics, el arrastre del modo edición y pygame-gui funcionan igual
-en cualquier monitor, sin conversiones.
-
-Cierre automático en segundo plano:
-    Si el jugador cambia a otra ventana (Alt+Tab, Win, clic en otro programa) o minimiza el
-    juego, la escena devuelve "salir" y el juego se cierra guardando el progreso. Se revisa en
-    cada cuadro con sin_foco(). Para no cerrar por error:
-      * solo cuenta si la ventana ya tuvo el foco alguna vez (si el juego se abre detrás de
-        otra ventana no se cierra solo);
-      * se ignoran los primeros GRACIA_MS milisegundos tras crear la ventana o pulsar F11,
-        porque al cambiar de modo el sistema a veces quita el foco un instante.
-    Se desactiva con CERRAR_AL_PERDER_FOCO = False (numerical_realms.py --sin-autocierre).
-
-Uso en una escena:
-    import ventana
-    pantalla = ventana.obtener_pantalla()       # la crea la primera vez, luego la reutiliza
-    ...
-    while True:
-        if ventana.sin_foco():                  # el jugador se fue a otra ventana
-            return "salir"
-        for ev in pygame.event.get():
-            if ventana.tecla_global(ev):        # F11: pantalla completa <-> ventana
-                continue
-"""
 import os
 
 # Suavizado al escalar (sin esto pygame escala "pixelado", que se ve mal en factores

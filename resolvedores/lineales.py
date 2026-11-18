@@ -1,14 +1,3 @@
-"""
-Resolvedor de los métodos de ecuaciones lineales (código de Vanessa).
-La matriz es la aumentada [A | b], como lista de filas.
-
-Las líneas marcadas con "# CORREGIDO" son los únicos cambios respecto al original:
-    * GaussSeidel y Jacobi: el criterio de paro nunca detenía el método (el break estaba
-      dentro de un "for i in range(len(x))" y solo salía de ese ciclo), así que siempre se
-      hacían 10 iteraciones. Ahora se detiene cuando el error máximo <= tol.
-    * GaussSeidel y Jacobi: "despejes" siempre salía vacío, porque se reasignaba
-      despejes = [] antes del zip(xs, despejes) que debía llenarlo.
-"""
 #Librerias
 import sympy as sp
 from fractions import Fraction
@@ -201,7 +190,7 @@ def GaussSeidel(matriz):
     xs, despejes = Despeje(matriz)
     fun = [sp.lambdify(xs, d, 'math') for d in despejes]
 
-    lista_despejes = []                              # CORREGIDO: antes se reasignaba "despejes"
+    lista_despejes = []                            
     for variable, expresion in zip(xs, despejes):
         despeje ={
             "expresion": expresion,
@@ -231,7 +220,7 @@ def GaussSeidel(matriz):
         iteraciones.append(iteracion.copy())
 
         if(round(max(errores), 3) <= tol):
-            break                                    # CORREGIDO: salía solo de un for interno
+            break                                    
 
     datos = {
         "iteraciones":iteraciones.copy(),
@@ -248,7 +237,7 @@ def Jacobi(matriz):
     xs, despejes = Despeje(matriz)
     fun = [sp.lambdify(xs, d, 'math') for d in despejes]
 
-    lista_despejes = []                              # CORREGIDO: antes se reasignaba "despejes"
+    lista_despejes = []                             
     for variable, expresion in zip(xs, despejes):
         despeje ={
             "expresion": expresion,
@@ -277,7 +266,7 @@ def Jacobi(matriz):
         iteraciones.append(iteracion.copy())
     
         if(round(max(errores), 3) <= tol):
-            break                                    # CORREGIDO: salía solo de un for interno
+            break                                
 
     datos = {
         "iteraciones":iteraciones.copy(),
